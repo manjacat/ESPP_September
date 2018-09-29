@@ -1,0 +1,19 @@
+url link development deployed:
+
+http://ibsb.dlinkddns.com/espp
+
+id:		940107015123
+password:	P@ssw0rd1234
+
+
+
+database connection:
+
+ip:		ibsb.dlinkddns.com
+port:		1521
+id:		spp
+password:	Pa$$w0rd
+service name:	orcl
+
+1- Excel
+2- 
