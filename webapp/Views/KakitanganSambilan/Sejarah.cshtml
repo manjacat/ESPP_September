@@ -720,8 +720,8 @@
                 $('select[name="tunggakanbulandibayar"]').find('option[value="' + defaultValue2 + '"]').attr("selected", true);
                 $('input[name="tunggakanbulandibayar"]').val(defaultValue2);
             }
-            catch{
-
+            catch (e) {
+                console.log(e.toString());
             }
 
             $("select[name='bulanbekerja']").change(function () {
@@ -763,7 +763,14 @@
             function pageload() {
                 $.ajax({
                     url: "../PengurusanKakitanganSambilan/Maklumat",
-                    data: { "HR_PEKERJA": $("#HR_PEKERJA").val(), "tahunbekerja": $("#tahunbekerja").val(), "bulanbekerja": $("#bulanbekerja").val(), "tahundibayar": $("#tahundibayar").val(), "bulandibayar": $("#bulandibayar").val(), "jumlahhari": $("#jumlahhari").val() },
+                    data: {
+                        "HR_PEKERJA": $("#HR_PEKERJA").val(),
+                        "tahunbekerja": $("#tahunbekerja").val(),
+                        "bulanbekerja": $("#bulanbekerja").val(),
+                        "tahundibayar": $("#tahundibayar").val(),
+                        "bulandibayar": $("#bulandibayar").val(),
+                        "jumlahhari": $("#jumlahhari").val()
+                    },
                     contentType: "application/json; charset=utf-8",
                     type: 'GET',
                     dataType: "json",
@@ -777,47 +784,73 @@
                         $("#jabatan").val(data.JABATAN)
                         $("#bahagian").val(data.BAHAGIAN)
                         $("#jumlahbayaranot").val(data.JUMLAHBAYARANOT)
-                        if ($("input[name='jumlahot']").val() != "" && $("input[name='jumlahhari']").val() != "") {
-                            $.ajax({
-                                url: "../PengurusanKakitanganSambilan/Overtime",
-                                data: { "HR_PEKERJA": $("#HR_PEKERJA").val(), "jumlahhari": $("#jumlahhari").val(), "jumlahot": $("#jumlahot").val() },
-                                //data: {
-                                //    "HR_PEKERJA": $("#HR_PEKERJA").val(), "jumlahhari": $("#jumlahhari").val(), "jumlahot": $("#jumlahot").val(),
-                                //    "bulanbekerja": $("#bulanbekerja").val(),
-                                //    "tahunbekerja": $("#tahunbekerja").val(),
-                                //    "bulandibayar": $("#bulandibayar").val(),
-                                //    "tahundibayar": $("#tahundibayar").val()},
-                                contentType: "application/json; charset=utf-8",
-                                type: 'GET',
-                                dataType: "json",
-                                success: function (data1) {
-                                    $("#jumlahbayaranot").val(data1.JUMLAHBAYARANOT)
-                                    $("#gajiper3").val(data1.GAJIPER3)
-                                    $("#gajikasar").val(data1.GAJIKASAR)
-                                    $("#gajisebelumkwsp").val(data1.GAJISEBELUMKWSP)
-                                    $("#gajisebelumpotongankwspbersamatunggakan").val(data1.KIRATUNGGAKAN)
-                                    $("#gajipokok").val(data.GAJIPOKOK)
-                                    $("#potongankwsp").val(data1.POTONGANKWSP)
-                                    $("#socso").val(data1.POTONGANSOCSO)
-                                    $("#gajibersih").val(data.GAJIBERSIH)
-                                    if (data.TUNGGAKANIND == "Y") {
-                                        $("input[name='tunggakan'][value='" + data.TUNGGAKANIND + "']").prop('checked', true);
-                                    }
-                                    if (data.TUNGGAKANIND == "T") {
-                                        $("input[name='tunggakan'][value='" + data.TUNGGAKANIND + "']").prop('checked', true);
-                                    }
-                                    if (data.MUKTAMAD == "0") {
-                                        document.getElementById("Muktamad").disabled = false;
-                                        document.getElementById("Kemaskini").disabled = false;
-                                    }
-                                    if (data.MUKTAMAD == "1") {
-                                        document.getElementById("Muktamad").disabled = true;
-                                        document.getElementById("Kemaskini").disabled = true;
-                                    }
-                                    $('#Hantar').attr('disabled', 'disabled').val('');
-                                }
-                            })
+                        $("#jumlahbayaranot").val(data.JUMLAHBAYARANOT)
+                        //baru tambah
+                        $("#tunggakangajikasar").val(data.GAJIKASAR)
+                        $("#gajiper3").val(data.GAJIPER3)
+                        $("#gajikasar").val(data.GAJIKASAR)
+                        $("#gajisebelumkwsp").val(data.GAJISEBELUMKWSP)
+                        $("#gajisebelumpotongankwspbersamatunggakan").val(data.KIRATUNGGAKAN)
+                        $("#gajipokok").val(data.GAJIPOKOK)
+                        $("#potongankwsp").val(data.POTONGANKWSP)
+                        $("#socso").val(data.POTONGANSOCSO)
+                        $("#gajibersih").val(data.GAJIBERSIH)
+                        if (data.TUNGGAKANIND == "Y") {
+                            $("input[name='tunggakan'][value='" + data.TUNGGAKANIND + "']").prop('checked', true);
                         }
+                        if (data.TUNGGAKANIND == "T") {
+                            $("input[name='tunggakan'][value='" + data.TUNGGAKANIND + "']").prop('checked', true);
+                        }
+                        if (data.MUKTAMAD == "0") {
+                            document.getElementById("Muktamad").disabled = false;
+                            document.getElementById("Kemaskini").disabled = false;
+                        }
+                        if (data.MUKTAMAD == "1") {
+                            document.getElementById("Muktamad").disabled = true;
+                            document.getElementById("Kemaskini").disabled = true;
+                        }
+                        $('#Hantar').attr('disabled', 'disabled').val('');
+                        //if ($("input[name='jumlahot']").val() != "" && $("input[name='jumlahhari']").val() != "") {
+                        //    $.ajax({
+                        //        url: "../PengurusanKakitanganSambilan/Overtime",
+                        //        data: { "HR_PEKERJA": $("#HR_PEKERJA").val(), "jumlahhari": $("#jumlahhari").val(), "jumlahot": $("#jumlahot").val() },
+                        //        //data: {
+                        //        //    "HR_PEKERJA": $("#HR_PEKERJA").val(), "jumlahhari": $("#jumlahhari").val(), "jumlahot": $("#jumlahot").val(),
+                        //        //    "bulanbekerja": $("#bulanbekerja").val(),
+                        //        //    "tahunbekerja": $("#tahunbekerja").val(),
+                        //        //    "bulandibayar": $("#bulandibayar").val(),
+                        //        //    "tahundibayar": $("#tahundibayar").val()},
+                        //        contentType: "application/json; charset=utf-8",
+                        //        type: 'GET',
+                        //        dataType: "json",
+                        //        success: function (data1) {
+                        //            $("#jumlahbayaranot").val(data1.JUMLAHBAYARANOT)
+                        //            $("#gajiper3").val(data1.GAJIPER3)
+                        //            $("#gajikasar").val(data1.GAJIKASAR)
+                        //            $("#gajisebelumkwsp").val(data1.GAJISEBELUMKWSP)
+                        //            $("#gajisebelumpotongankwspbersamatunggakan").val(data1.KIRATUNGGAKAN)
+                        //            $("#gajipokok").val(data.GAJIPOKOK)
+                        //            $("#potongankwsp").val(data1.POTONGANKWSP)
+                        //            $("#socso").val(data1.POTONGANSOCSO)
+                        //            $("#gajibersih").val(data.GAJIBERSIH)
+                        //            if (data.TUNGGAKANIND == "Y") {
+                        //                $("input[name='tunggakan'][value='" + data.TUNGGAKANIND + "']").prop('checked', true);
+                        //            }
+                        //            if (data.TUNGGAKANIND == "T") {
+                        //                $("input[name='tunggakan'][value='" + data.TUNGGAKANIND + "']").prop('checked', true);
+                        //            }
+                        //            if (data.MUKTAMAD == "0") {
+                        //                document.getElementById("Muktamad").disabled = false;
+                        //                document.getElementById("Kemaskini").disabled = false;
+                        //            }
+                        //            if (data.MUKTAMAD == "1") {
+                        //                document.getElementById("Muktamad").disabled = true;
+                        //                document.getElementById("Kemaskini").disabled = true;
+                        //            }
+                        //            $('#Hantar').attr('disabled', 'disabled').val('');
+                        //        }
+                        //    })
+                        //}
                     }
                 })
                 $.ajax({
@@ -848,7 +881,7 @@
                                 $("#gajikasar").val(data.GAJIKASAR)
                                 $("#gajisebelumkwsp").val(data.GAJISEBELUMKWSP)
                                 $("#gajisebelumpotongankwspbersamatunggakan").val(data.KIRATUNGGAKAN)
-                                $("#gajipokok").val(data.GAJIBASIC)
+                                $("#gajipokok").val(data.GAJIPOKOK)
                                 $("#potongankwsp").val(data.POTONGANKWSP)
                                 $("#socso").val(data.POTONGANSOCSO)
                                 $("#gajibersih").val(data.GAJIBERSIH)
@@ -971,20 +1004,21 @@
                     }
                 })
 
-                $("#list1").html("<option></option>")
-                $.ajax({
-                    url: "../PengurusanKakitanganSambilan/ElaunPotongan",
-                    data: { "HR_PEKERJA": $("#HR_PEKERJA").val() },
-                    contentType: "application/json; charset=utf-8",
-                    type: 'GET',
-                    dataType: "json",
-                    success: function (data) {
-                        var o = 0;
-                        $.each(data, function (i, v) {
-                            $("#list1").empty().append($("<option value='" + v.KOD + "'>" + v.KETERANGAN + "</option>"));
-                        })
-                    }
-                })
+                // Comment Sebab List1 pun bukannya ada
+                //$("#list1").html("<option></option>")
+                //$.ajax({
+                //    url: "../PengurusanKakitanganSambilan/ElaunPotongan",
+                //    data: { "HR_PEKERJA": $("#HR_PEKERJA").val() },
+                //    contentType: "application/json; charset=utf-8",
+                //    type: 'GET',
+                //    dataType: "json",
+                //    success: function (data) {
+                //        var o = 0;
+                //        $.each(data, function (i, v) {
+                //            $("#list1").empty().append($("<option value='" + v.KOD + "'>" + v.KETERANGAN + "</option>"));
+                //        })
+                //    }
+                //})
                 /*$.ajax({
                     url: "PengurusanKakitanganSambilan/Tunggakan",
                     type: "GET",

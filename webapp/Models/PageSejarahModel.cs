@@ -11,6 +11,14 @@ namespace eSPP.Models
 
     public class PageSejarahModel
     {
+        public static int ConstHariBekerja
+        {
+            get
+            {
+                return 21;
+            }
+        }
+
         public PageSejarahModel()
         {
             bulandibayar = DateTime.Now.Month;
@@ -237,12 +245,15 @@ namespace eSPP.Models
                 && DateTime.Now >= s.HR_TARIKH_MULA && DateTime.Now <= s.HR_TARIKH_AKHIR
                 && s.HR_AKTIF_IND == "Y"
                 && s.HR_KOD_ELAUN_POTONGAN != "E0164").ToList();
-            List<HR_MAKLUMAT_ELAUN_POTONGAN> maklumatpotongan1 = db.HR_MAKLUMAT_ELAUN_POTONGAN
-                .Where(s => s.HR_NO_PEKERJA == agree.HR_PEKERJA
-                && s.HR_KOD_ELAUN_POTONGAN.Contains("P")
-                && DateTime.Now >= s.HR_TARIKH_MULA && DateTime.Now <= s.HR_TARIKH_AKHIR
-                && s.HR_AKTIF_IND == "Y"
-                && s.HR_KOD_ELAUN_POTONGAN != "P0015").ToList();
+
+            //TODO: nak make sure bila insert, semua maklumat potongan masuk
+
+            //List<HR_MAKLUMAT_ELAUN_POTONGAN> maklumatpotongan1 = db.HR_MAKLUMAT_ELAUN_POTONGAN
+            //    .Where(s => s.HR_NO_PEKERJA == agree.HR_PEKERJA
+            //    && s.HR_KOD_ELAUN_POTONGAN.Contains("P")
+            //    && DateTime.Now >= s.HR_TARIKH_MULA && DateTime.Now <= s.HR_TARIKH_AKHIR
+            //    && s.HR_AKTIF_IND == "Y"
+            //    && s.HR_KOD_ELAUN_POTONGAN != "P0015").ToList();
             HR_MAKLUMAT_ELAUN_POTONGAN maklumatpotongan = db.HR_MAKLUMAT_ELAUN_POTONGAN.SingleOrDefault
                 (s => s.HR_NO_PEKERJA == agree.HR_PEKERJA
                 && s.HR_KOD_ELAUN_POTONGAN.Contains("P")
@@ -256,10 +267,10 @@ namespace eSPP.Models
                 && s.HR_AKTIF_IND == "Y"
                 && s.HR_KOD_ELAUN_POTONGAN != "C0020").ToList();
             agree.gajipokok = mpekerjaan.HR_GAJI_POKOK != null ? Convert.ToDecimal(mpekerjaan.HR_GAJI_POKOK) : 0;
-            var gajisehari = (mpekerjaan.HR_GAJI_POKOK / 23) * agree.jumlahhari;
+            var gajisehari = (mpekerjaan.HR_GAJI_POKOK / ConstHariBekerja) * agree.jumlahhari;
             decimal gajipokok = gajisehari != null ? Convert.ToDecimal(gajisehari) : 0;
             gajipokok = Decimal.Round(gajipokok, 2);
-            var gajisehariot = (((agree.gajipokok / 23) * agree.jumlahhari) * 12 / 2504);
+            var gajisehariot = (((agree.gajipokok / ConstHariBekerja) * agree.jumlahhari) * 12 / 2504);
             var gajisehariot1 = gajisehariot * agree.jumlahot;
 
             var tbl = db.Users.Where(p => p.Id == user).SingleOrDefault();

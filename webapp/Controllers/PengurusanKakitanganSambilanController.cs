@@ -937,210 +937,28 @@ namespace eSPP.Controllers
             return Json(maklumatperibadi, JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult Maklumat(string HR_PEKERJA, int? tahunbekerja, int? bulanbekerja, int? tahundibayar, int? bulandibayar, string tahunbulannotis, string tahunbulanbonus, string bulankiradari, string bulankirahingga, decimal? jumlahot, int? jumlahhari)
+        public JsonResult Maklumat(string HR_PEKERJA, 
+            int? tahunbekerja, 
+            int? bulanbekerja, 
+            int? tahundibayar, 
+            int? bulandibayar, 
+            string tahunbulannotis, string tahunbulanbonus, string bulankiradari, string bulankirahingga, 
+            decimal? jumlahot, int? jumlahhari)
         {
-            ApplicationDbContext db = new ApplicationDbContext();
-            MajlisContext mc = new MajlisContext();
-            db.Configuration.ProxyCreationEnabled = false;
-            HR_MAKLUMAT_PEKERJAAN item1 = db.HR_MAKLUMAT_PEKERJAAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA).SingleOrDefault();
-            if (item1 != null)
+            //calculation moved to Model/TraksaksiSambilanModels
+            AgreementModels kerjaElaun = TraksaksiSambilanModels.Maklumat(HR_PEKERJA, tahunbekerja, bulanbekerja, tahundibayar, bulandibayar,
+                tahunbulannotis, tahunbulanbonus, bulankiradari, bulankirahingga, jumlahot, jumlahhari);
+            if(kerjaElaun != null)
             {
-                GE_JABATAN jabatan = mc.GE_JABATAN.Where(s => s.GE_KOD_JABATAN == item1.HR_JABATAN).SingleOrDefault();
-                GE_BAHAGIAN bahagian = mc.GE_BAHAGIAN.Where(s => s.GE_KOD_BAHAGIAN == item1.HR_BAHAGIAN && s.GE_KOD_JABATAN == item1.HR_JABATAN).SingleOrDefault();
-                List<HR_TRANSAKSI_SAMBILAN_DETAIL> transaksisambilandetail = db.HR_TRANSAKSI_SAMBILAN_DETAIL.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_BULAN_BEKERJA == bulanbekerja && s.HR_BULAN_DIBAYAR == bulandibayar && s.HR_TAHUN == tahundibayar && s.HR_TAHUN_BEKERJA == tahunbekerja).ToList();
-                List<HR_TRANSAKSI_SAMBILAN> transaksisambilan = db.HR_TRANSAKSI_SAMBILAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_BULAN_BEKERJA == bulanbekerja && s.HR_BULAN_DIBAYAR == bulandibayar && s.HR_TAHUN == tahundibayar && s.HR_TAHUN_BEKERJA == tahunbekerja).ToList();
-                HR_MAKLUMAT_PERIBADI peribadi = db.HR_MAKLUMAT_PERIBADI.SingleOrDefault(s => s.HR_NO_PEKERJA == HR_PEKERJA);
-                HR_MAKLUMAT_PEKERJAAN pekerjaan = db.HR_MAKLUMAT_PEKERJAAN.SingleOrDefault(s => s.HR_NO_PEKERJA == HR_PEKERJA);
-                HR_JAWATAN jawatan = db.HR_JAWATAN.SingleOrDefault(s => s.HR_KOD_JAWATAN == pekerjaan.HR_JAWATAN);
-                var gajibonussehari = pekerjaan.HR_GAJI_POKOK / 23;
-
-                //if (transaksisambilandetail.Count != 0 && transaksisambilan.Count != 0)
-                if (transaksisambilandetail.Count != 0)
-                {
-                    HR_MAKLUMAT_PEKERJAAN mpekerjaan = db.HR_MAKLUMAT_PEKERJAAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA).SingleOrDefault();
-                    List<HR_TRANSAKSI_SAMBILAN_DETAIL> elaunka = db.HR_TRANSAKSI_SAMBILAN_DETAIL.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_BULAN_BEKERJA == bulanbekerja && s.HR_BULAN_DIBAYAR == bulandibayar && s.HR_TAHUN == tahundibayar && s.HR_TAHUN_BEKERJA == tahunbekerja && s.HR_KOD == "E0064" || s.HR_KOD == "E0096" || s.HR_KOD == "E0105" || s.HR_KOD == "E0151").ToList();
-                    List<HR_TRANSAKSI_SAMBILAN_DETAIL> elaunot = db.HR_TRANSAKSI_SAMBILAN_DETAIL.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_BULAN_BEKERJA == bulanbekerja && s.HR_BULAN_DIBAYAR == bulandibayar && s.HR_TAHUN == tahundibayar && s.HR_TAHUN_BEKERJA == tahunbekerja && s.HR_KOD == "E0164").ToList();
-                    List<HR_TRANSAKSI_SAMBILAN_DETAIL> elaunlain = db.HR_TRANSAKSI_SAMBILAN_DETAIL.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_BULAN_BEKERJA == bulanbekerja && s.HR_BULAN_DIBAYAR == bulandibayar && s.HR_TAHUN == tahundibayar && s.HR_TAHUN_BEKERJA == tahunbekerja && s.HR_KOD_IND == "E" && (s.HR_KOD != "E0064" || s.HR_KOD != "E0096" || s.HR_KOD != "E0105" || s.HR_KOD != "E0151" || s.HR_KOD == "E0164")).ToList();
-                    List<HR_TRANSAKSI_SAMBILAN_DETAIL> potonganksdk = db.HR_TRANSAKSI_SAMBILAN_DETAIL.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_BULAN_BEKERJA == bulanbekerja && s.HR_BULAN_DIBAYAR == bulandibayar && s.HR_TAHUN == tahundibayar && s.HR_TAHUN_BEKERJA == tahunbekerja && s.HR_KOD == "P0015").ToList();
-                    List<HR_TRANSAKSI_SAMBILAN_DETAIL> potonganlain = db.HR_TRANSAKSI_SAMBILAN_DETAIL.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_BULAN_BEKERJA == bulanbekerja && s.HR_BULAN_DIBAYAR == bulandibayar && s.HR_TAHUN == tahundibayar && s.HR_TAHUN_BEKERJA == tahunbekerja && s.HR_KOD_IND == "P" && (s.HR_KOD != "P0015")).ToList();
-                    List<HR_TRANSAKSI_SAMBILAN_DETAIL> caruman = db.HR_TRANSAKSI_SAMBILAN_DETAIL.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_BULAN_BEKERJA == bulanbekerja && s.HR_BULAN_DIBAYAR == bulandibayar && s.HR_TAHUN == tahundibayar && s.HR_TAHUN_BEKERJA == tahunbekerja).ToList();
-                    HR_TRANSAKSI_SAMBILAN_DETAIL gaji = db.HR_TRANSAKSI_SAMBILAN_DETAIL.SingleOrDefault(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_BULAN_BEKERJA == bulanbekerja && s.HR_BULAN_DIBAYAR == bulandibayar && s.HR_TAHUN == tahundibayar && s.HR_TAHUN_BEKERJA == tahunbekerja && s.HR_KOD_IND == "G");
-                    HR_TRANSAKSI_SAMBILAN_DETAIL overtime = db.HR_TRANSAKSI_SAMBILAN_DETAIL.SingleOrDefault(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_BULAN_BEKERJA == bulanbekerja && s.HR_BULAN_DIBAYAR == bulandibayar && s.HR_TAHUN == tahundibayar && s.HR_TAHUN_BEKERJA == tahunbekerja && s.HR_KOD == "E0164");
-                    List<HR_KWSP> listkwsp = db.HR_KWSP.ToList();
-                    AgreementModels kerjaelaun = new AgreementModels();
-                    decimal? sum = 0;
-                    decimal? sum1 = 0;
-                    decimal? sum2 = 0;
-                    decimal? sum3 = 0;
-                    decimal? sum4 = 0;
-                    decimal? sum5 = 0;
-                    foreach (var elaunka1 in elaunka)
-                    {
-                        sum = sum + elaunka1.HR_JUMLAH;
-                    }
-                    foreach (var elaunot1 in elaunot)
-                    {
-                        sum1 = sum1 + elaunot1.HR_JUMLAH;
-                    }
-                    foreach (var elaunlain1 in elaunlain)
-                    {
-                        sum2 = sum2 + elaunlain1.HR_JUMLAH;
-                    }
-                    foreach (var potonganksdk1 in potonganksdk)
-                    {
-                        sum3 = sum3 + potonganksdk1.HR_JUMLAH;
-                    }
-                    foreach (var potonganlain1 in potonganlain)
-                    {
-                        sum4 = sum4 + potonganlain1.HR_JUMLAH;
-                    }
-                    foreach (var caruman1 in caruman)
-                    {
-                        sum5 = sum5 + caruman1.HR_JUMLAH;
-                    }
-                    kerjaelaun.JABATAN = jabatan.GE_KETERANGAN_JABATAN;
-                    kerjaelaun.BAHAGIAN = bahagian.GE_KETERANGAN;
-                    kerjaelaun.NOKP = peribadi.HR_NO_KPBARU;
-                    kerjaelaun.JAWATAN = jawatan.HR_NAMA_JAWATAN;
-                    kerjaelaun.GAJISEHARI = gajibonussehari.Value.ToString("0.00");
-                    var gajikasar = gaji.HR_JUMLAH.Value.ToString("0.00");
-                    kerjaelaun.GAJIKASAR = gajikasar;
-                    kerjaelaun.JAMBEKERJA = overtime.HR_JAM_HARI;
-                    kerjaelaun.HARIBEKERJA = gaji.HR_JAM_HARI;
-                    kerjaelaun.ELAUNKA = sum.Value.ToString("0.00");
-                    kerjaelaun.JUMLAHBAYARANOT = sum1.Value.ToString("0.00");
-                    kerjaelaun.ELAUNLAIN = sum2.Value.ToString("0.00");
-                    kerjaelaun.POTONGANKSDK = sum3.Value.ToString("0.00");
-                    kerjaelaun.POTONGLAIN = sum4.Value.ToString("0.00");
-                    HR_TRANSAKSI_SAMBILAN_DETAIL tunggakanind = db.HR_TRANSAKSI_SAMBILAN_DETAIL.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_BULAN_BEKERJA == bulanbekerja && s.HR_BULAN_DIBAYAR == bulandibayar && s.HR_TAHUN == tahundibayar && s.HR_KOD == "GAJPS").SingleOrDefault();
-                    kerjaelaun.TUNGGAKANIND = tunggakanind.HR_TUNGGAKAN_IND;
-                    kerjaelaun.GAJIPOKOK = gaji.HR_JUMLAH;
-                    var bersih = kerjaelaun.GAJIPOKOK + sum + sum1 + sum2 - sum3 - sum4;
-                    kerjaelaun.GAJIBERSIH = decimal.Parse(bersih.Value.ToString("0.00"));
-                    kerjaelaun.MUKTAMAD = gaji.HR_MUKTAMAD;
-                    //var gajisehari = mpekerjaan.HR_GAJI_POKOK / 23;
-                    //var gajipokok = gajisehari * jumlahhari;
-                    //kerjaelaun.GAJIBASIC = gajipokok.Value.ToString("0.00");
-                    //kerjaelaun.GAJIBERSIH = gajipokok + sum - sum1 + sum2 - sum3;
-                    /*string[] cbulankiradari = bulankiradari.Split('/');
-					string[] cbulankirahingga = bulankirahingga.Split('/');
-
-					int[] selectbulankiradari = Array.ConvertAll(cbulankiradari, int.Parse);
-					int[] selectbulankirahingga = Array.ConvertAll(cbulankirahingga, int.Parse);
-
-					for (int i = 0; i < selectbulankiradari.Length; i++)
-					{
-						var pp = selectbulankirahingga.ElementAt(i);
-
-						var bulandari = DateTime.Now.AddMonths(-selectbulankiradari[0]).Month;
-						var tahundari = DateTime.Now.AddMonths(selectbulankiradari[1]).Year;
-						var bulanhingga = DateTime.Now.AddMonths(pp).Month;
-						var tahunhingga = DateTime.Now.AddMonths(pp).Year;
-						var tarikh = "01/" + bulandari + "/" + tahundari;
-						var kiratarikh = Convert.ToDateTime(tarikh);
-						var bulan = DateTime.Now.Month;
-						var tahun = DateTime.Now.Year;
-						var now = "01/" + bulan + "/" + tahun;
-						var tarikhnow = Convert.ToDateTime(now);
-						List<HR_TRANSAKSI_SAMBILAN_DETAIL> sambilan = db.HR_TRANSAKSI_SAMBILAN_DETAIL.AsEnumerable().Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_KOD == "GAJPS" && (Convert.ToDateTime("01/" + s.HR_BULAN_DIBAYAR + "/" + s.HR_TAHUN) >= kiratarikh) && (Convert.ToDateTime("01/" + s.HR_BULAN_DIBAYAR + "/" + s.HR_TAHUN) <= tarikhnow)).ToList();
-						var sumbonus = sambilan.Sum(uf => uf.HR_JUMLAH);
-						var purata = sumbonus / sambilan.Count;
-						var bonus = (purata * sambilan.Count) / bulanbonus;
-						foreach (var kwsp in listkwsp)
-						{
-							if (bonus >= kwsp.HR_UPAH_DARI && bonus <= kwsp.HR_UPAH_HINGGA)
-							{
-								kerjaelaun.CARUMANKWSP = kwsp.HR_CARUMAN_MAJIKAN;
-								kerjaelaun.POTONGANKWSP = kwsp.HR_CARUMAN_PEKERJA;
-								var jumlah = bonus - kwsp.HR_CARUMAN_PEKERJA;
-								kerjaelaun.JUMLAHBONUS = jumlah;
-							}
-						}
-						kerjaelaun.BONUS = bonus.Value.ToString("0.00");
-					}*/
-
-                    return Json(kerjaelaun, JsonRequestBehavior.AllowGet);
-                }
-                else if (transaksisambilandetail.Count == 0 && transaksisambilan.Count == 0)
-                {
-                    HR_MAKLUMAT_PEKERJAAN mpekerjaan = db.HR_MAKLUMAT_PEKERJAAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA).SingleOrDefault();
-                    HR_MAKLUMAT_ELAUN_POTONGAN gaji = db.HR_MAKLUMAT_ELAUN_POTONGAN.SingleOrDefault(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_KOD_ELAUN_POTONGAN == "GAJPS");
-                    List<HR_MAKLUMAT_ELAUN_POTONGAN> ksdk = db.HR_MAKLUMAT_ELAUN_POTONGAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_KOD_ELAUN_POTONGAN == "P0015").ToList();
-                    List<HR_MAKLUMAT_ELAUN_POTONGAN> potonganlain = db.HR_MAKLUMAT_ELAUN_POTONGAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_ELAUN_POTONGAN_IND == "P" && (s.HR_KOD_ELAUN_POTONGAN != "P0015")).ToList();
-                    List<HR_MAKLUMAT_ELAUN_POTONGAN> elaunka = db.HR_MAKLUMAT_ELAUN_POTONGAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && (s.HR_KOD_ELAUN_POTONGAN == "E0064" || s.HR_KOD_ELAUN_POTONGAN == "E0096" || s.HR_KOD_ELAUN_POTONGAN == "E0151" || s.HR_KOD_ELAUN_POTONGAN == "E0105")).ToList();
-                    List<HR_MAKLUMAT_ELAUN_POTONGAN> elaunka1 = db.HR_MAKLUMAT_ELAUN_POTONGAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_ELAUN_POTONGAN_IND == "E" && (s.HR_KOD_ELAUN_POTONGAN != "E0064" || s.HR_KOD_ELAUN_POTONGAN != "E0096" || s.HR_KOD_ELAUN_POTONGAN != "E0151" || s.HR_KOD_ELAUN_POTONGAN != "E0105")).ToList();
-                    HR_MAKLUMAT_ELAUN_POTONGAN caruman = db.HR_MAKLUMAT_ELAUN_POTONGAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_ELAUN_POTONGAN_IND == "C").First();
-                    HR_MAKLUMAT_ELAUN_POTONGAN gajiupahan = db.HR_MAKLUMAT_ELAUN_POTONGAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_ELAUN_POTONGAN_IND == "G").First();
-                    AgreementModels kerjaelaun = new AgreementModels();
-                    List<HR_KWSP> listkwsp = db.HR_KWSP.ToList();
-                    decimal? sum = 0;
-                    decimal? sum1 = 0;
-                    decimal? sum2 = 0;
-                    decimal? sum3 = 0;
-                    foreach (var elaun in elaunka)
-                    {
-                        sum = sum + elaun.HR_JUMLAH;
-                    }
-                    foreach (var potongan in ksdk)
-                    {
-                        sum1 = potongan.HR_JUMLAH;
-                    }
-                    foreach (var lain2 in elaunka1)
-                    {
-                        sum2 = sum2 + lain2.HR_JUMLAH;
-                    }
-                    foreach (var potonglain in potonganlain)
-                    {
-                        sum3 = sum3 + potonglain.HR_JUMLAH;
-                    }
-                    kerjaelaun.GAJIPOKOK = mpekerjaan.HR_GAJI_POKOK;
-                    var gajisehari = mpekerjaan.HR_GAJI_POKOK / 23;
-                    decimal? gajiper3 = kerjaelaun.GAJIPOKOK / 3;
-                    kerjaelaun.GAJIPER3 = gajiper3.Value.ToString("0.00");
-                    kerjaelaun.ELAUNKA = sum.Value.ToString("0.00");
-                    kerjaelaun.POTONGANKSDK = sum1.Value.ToString("0.00");
-                    kerjaelaun.ELAUNLAIN = sum2.Value.ToString("0.00");
-                    kerjaelaun.POTONGLAIN = sum3.Value.ToString("0.00");
-                    kerjaelaun.JABATAN = jabatan.GE_KETERANGAN_JABATAN;
-                    kerjaelaun.BAHAGIAN = bahagian.GE_KETERANGAN;
-                    kerjaelaun.NOKP = peribadi.HR_NO_KPBARU;
-                    kerjaelaun.JAWATAN = jawatan.HR_NAMA_JAWATAN;
-                    kerjaelaun.GAJISEHARI = gajibonussehari.Value.ToString("0.00");
-                    decimal? gajikasar = sum + sum2 + kerjaelaun.GAJIPOKOK;
-                    double? gajikasar1 = (double)gajikasar * 0.11;
-                    var gajisebelumkwsp = gajikasar1.Value.ToString("0.00");
-                    /*List<HR_KWSP> listkwsp = db.HR_KWSP.ToList();
-					var bulanbonuskira = DateTime.Now.AddMonths(-bulanbonus).Month;
-					var tahunkira = DateTime.Now.AddMonths(-bulanbonus).Year;
-					var bulan = DateTime.Now.Month;
-					var tahun = DateTime.Now.Year;
-					var tarikh = "01/" + bulanbonuskira + "/" + tahunkira;
-					var now = "01/" + bulan + "/" + tahun;
-					var kiratarikh = Convert.ToDateTime(tarikh);
-					var tarikhnow = Convert.ToDateTime(now);
-					List<HR_TRANSAKSI_SAMBILAN_DETAIL> sambilan = db.HR_TRANSAKSI_SAMBILAN_DETAIL.AsEnumerable().Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_KOD == "GAJPS" && (Convert.ToDateTime("01/" + s.HR_BULAN_DIBAYAR + "/" + s.HR_TAHUN) >= kiratarikh) && (Convert.ToDateTime("01/" + s.HR_BULAN_DIBAYAR + "/" + s.HR_TAHUN) <= tarikhnow)).ToList();
-					var sumbonus = sambilan.Sum(uf => uf.HR_JUMLAH);
-					var purata = sumbonus / sambilan.Count;
-					var bonus = (purata * sambilan.Count) / bulanbonus;
-
-					foreach (var kwsp in listkwsp)
-					{
-						if (bonus >= kwsp.HR_UPAH_DARI && bonus <= kwsp.HR_UPAH_HINGGA)
-						{
-							kerjaelaun.CARUMANKWSP = kwsp.HR_CARUMAN_MAJIKAN;
-							kerjaelaun.POTONGANKWSP = kwsp.HR_CARUMAN_PEKERJA;
-							var jumlah = bonus - kwsp.HR_CARUMAN_PEKERJA;
-							kerjaelaun.JUMLAHBONUS = jumlah;
-						}
-					}
-
-					kerjaelaun.BONUS = bonus.Value.ToString("0.00");*/
-                    return Json(kerjaelaun, JsonRequestBehavior.AllowGet);
-                }
+                return Json(kerjaElaun, JsonRequestBehavior.AllowGet);
             }
-            return Json(JsonRequestBehavior.AllowGet);
+            else
+            {
+                return Json(JsonRequestBehavior.AllowGet);
+            }
         }
 
+        #region Entah Pakai Entah Tak
         public JsonResult MaklumatBonus(string HR_PEKERJA, string tahunbulannotis, string tahunbulanbonus, string bulankiradari, string bulankirahingga)
         {
             ApplicationDbContext db = new ApplicationDbContext();
@@ -1222,108 +1040,23 @@ namespace eSPP.Controllers
             }
             return Json(JsonRequestBehavior.AllowGet);
         }
+        #endregion
 
-        public JsonResult Overtime(string HR_PEKERJA, int? tahunbekerja, int? bulanbekerja, int? tahundibayar, int? bulandibayar, string tahunbulannotis, string tahunbulanbonus, decimal? jumlahot, int? jumlahhari, int? bulanbonus, string bulankiradari, string bulankirahingga)
+        public JsonResult Overtime(string HR_PEKERJA, 
+            int? tahunbekerja, 
+            int? bulanbekerja, 
+            int? tahundibayar, 
+            int? bulandibayar, 
+            string tahunbulannotis, string tahunbulanbonus, 
+            //int? bulanbonus, 
+            string bulankiradari, string bulankirahingga,
+            decimal? jumlahot, int? jumlahhari)
         {
-            ApplicationDbContext db = new ApplicationDbContext();
-            MajlisContext mc = new MajlisContext();
-            db.Configuration.ProxyCreationEnabled = false;
-            HR_MAKLUMAT_PEKERJAAN item1 = db.HR_MAKLUMAT_PEKERJAAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA).SingleOrDefault();
-            List<HR_TRANSAKSI_SAMBILAN_DETAIL> transaksisambilandetail = db.HR_TRANSAKSI_SAMBILAN_DETAIL.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_BULAN_BEKERJA == bulanbekerja && s.HR_BULAN_DIBAYAR == bulandibayar && s.HR_TAHUN == tahundibayar && s.HR_TAHUN_BEKERJA == tahunbekerja).ToList();
-            List<HR_TRANSAKSI_SAMBILAN> transaksisambilan = db.HR_TRANSAKSI_SAMBILAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_BULAN_BEKERJA == bulanbekerja && s.HR_BULAN_DIBAYAR == bulandibayar && s.HR_TAHUN == tahundibayar && s.HR_TAHUN_BEKERJA == tahunbekerja).ToList();
-            List<HR_MAKLUMAT_PERIBADI> peribadi = db.HR_MAKLUMAT_PERIBADI.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA).ToList();
-
-            if (transaksisambilandetail.Count == 0 && transaksisambilan.Count == 0)
+            AgreementModels kerjaElaun = TraksaksiSambilanModels.Maklumat(HR_PEKERJA, tahunbekerja, bulanbekerja, tahundibayar, bulandibayar,
+                tahunbulannotis, tahunbulanbonus, bulankiradari, bulankirahingga, jumlahot, jumlahhari);
+            if (kerjaElaun != null)
             {
-                if (item1 == null)
-                {
-                    GE_BAHAGIAN listbahagian = new GE_BAHAGIAN();
-                    GE_JABATAN listjabatan = new GE_JABATAN();
-                }
-                HR_MAKLUMAT_PEKERJAAN mpekerjaan = db.HR_MAKLUMAT_PEKERJAAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA).SingleOrDefault();
-                List<HR_MAKLUMAT_ELAUN_POTONGAN> elaunpotongan = db.HR_MAKLUMAT_ELAUN_POTONGAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA).ToList();
-                HR_MAKLUMAT_ELAUN_POTONGAN gaji = db.HR_MAKLUMAT_ELAUN_POTONGAN.SingleOrDefault(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_KOD_ELAUN_POTONGAN == "GAJPS");
-                List<HR_MAKLUMAT_ELAUN_POTONGAN> ksdk = db.HR_MAKLUMAT_ELAUN_POTONGAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_KOD_ELAUN_POTONGAN == "P0015").ToList();
-                List<HR_MAKLUMAT_ELAUN_POTONGAN> potonganlain = db.HR_MAKLUMAT_ELAUN_POTONGAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_ELAUN_POTONGAN_IND == "P" && (s.HR_KOD_ELAUN_POTONGAN != "P0015")).ToList();
-                List<HR_MAKLUMAT_ELAUN_POTONGAN> elaunka = db.HR_MAKLUMAT_ELAUN_POTONGAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && (s.HR_KOD_ELAUN_POTONGAN == "E0064" || s.HR_KOD_ELAUN_POTONGAN == "E0096" || s.HR_KOD_ELAUN_POTONGAN == "E0151" || s.HR_KOD_ELAUN_POTONGAN == "E0105")).ToList();
-                List<HR_MAKLUMAT_ELAUN_POTONGAN> elaunka1 = db.HR_MAKLUMAT_ELAUN_POTONGAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_ELAUN_POTONGAN_IND == "E" && (s.HR_KOD_ELAUN_POTONGAN != "E0064" || s.HR_KOD_ELAUN_POTONGAN != "E0096" || s.HR_KOD_ELAUN_POTONGAN != "E0151" || s.HR_KOD_ELAUN_POTONGAN != "E0105")).ToList();
-                HR_MAKLUMAT_ELAUN_POTONGAN caruman = db.HR_MAKLUMAT_ELAUN_POTONGAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_ELAUN_POTONGAN_IND == "C").First();
-                HR_MAKLUMAT_ELAUN_POTONGAN gajiupahan = db.HR_MAKLUMAT_ELAUN_POTONGAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_ELAUN_POTONGAN_IND == "G").First();
-                List<HR_TRANSAKSI_SAMBILAN_DETAIL> tunggakan = db.HR_TRANSAKSI_SAMBILAN_DETAIL.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_TUNGGAKAN_IND == "Y").ToList();
-                AgreementModels kerjaelaun = new AgreementModels();
-                List<HR_KWSP> listkwsp = db.HR_KWSP.ToList();
-                List<HR_SOCSO> listsocso = db.HR_SOCSO.ToList();
-                decimal? sum = 0;
-                decimal? sum1 = 0;
-                decimal? sum2 = 0;
-                decimal? sum3 = 0;
-                decimal? sum4 = 0;
-                foreach (var elaun in elaunka)
-                {
-                    sum = sum + elaun.HR_JUMLAH;
-                }
-                foreach (var potongan in ksdk)
-                {
-                    sum1 = potongan.HR_JUMLAH;
-                }
-                foreach (var lain2 in elaunka1)
-                {
-                    sum2 = sum2 + lain2.HR_JUMLAH;
-                }
-                foreach (var potonglain in potonganlain)
-                {
-                    sum3 = sum3 + potonglain.HR_JUMLAH;
-                }
-                foreach (var kiratunggakan in tunggakan)
-                {
-                    sum4 = sum4 + kiratunggakan.HR_JUMLAH;
-                }
-                //kerjaelaun.GAJIBASIC = mpekerjaan.HR_GAJI_POKOK.Value.ToString("0.00");
-                //kerjaelaun.GAJIPOKOK = mpekerjaan.HR_GAJI_POKOK;
-                var gajisehari = mpekerjaan.HR_GAJI_POKOK / 23;
-                var otsehari = (((gajisehari * jumlahhari) * 12) / 2504);
-                var jumlah = otsehari * jumlahot;
-                if (jumlah != null)
-                {
-                    kerjaelaun.JUMLAHBAYARANOT = jumlah.Value.ToString("0.00");
-                    kerjaelaun.POTONGANKSDK = sum1.Value.ToString("0.00");
-                    kerjaelaun.ELAUNLAIN = sum2.Value.ToString("0.00");
-                    kerjaelaun.POTONGLAIN = sum3.Value.ToString("0.00");
-                    decimal? gajikasar = sum + sum2 + gajisehari * jumlahhari + jumlah;
-                    kerjaelaun.GAJIKASAR = gajikasar.Value.ToString("0.00");
-                    var kirakwsp = gajisehari * jumlahhari;
-                    kerjaelaun.GAJISEBELUMKWSP = kirakwsp.Value.ToString("0.00");
-                    var kira = sum4 + kirakwsp;
-                    kerjaelaun.KIRATUNGGAKAN = kira.Value.ToString("0.00");
-                    var gajipokok = gajisehari * jumlahhari;
-                    foreach (var kwsp in listkwsp)
-                    {
-                        if (gajipokok >= kwsp.HR_UPAH_DARI && gajipokok <= kwsp.HR_UPAH_HINGGA)
-                        {
-                            kerjaelaun.CARUMANKWSP = decimal.Parse(kwsp.HR_CARUMAN_MAJIKAN.ToString("0.00"));
-                            kerjaelaun.POTONGANKWSP = decimal.Parse(kwsp.HR_CARUMAN_PEKERJA.ToString("0.00"));
-                        }
-                    }
-                    foreach (var kwsp in listsocso)
-                    {
-                        if (gajipokok >= kwsp.HR_GAJI_DARI && gajipokok <= kwsp.HR_GAJI_HINGGA)
-                        {
-                            kerjaelaun.CARUMANSOCSO = kwsp.HR_CARUMAN_MAJIKAN;
-                            kerjaelaun.POTONGANSOCSO = kwsp.HR_CARUMAN_PEKERJA;
-                        }
-                    }
-                    kerjaelaun.GAJIBASIC = string.Format("{0:0.00}", gajipokok);
-                    decimal gajibersih = Convert.ToDecimal(gajipokok + sum + sum1 + sum2 - sum3);
-                    kerjaelaun.GAJIBERSIH = Math.Round(gajibersih,2);
-                    decimal? gajiper3 = gajipokok / 3;
-                    kerjaelaun.GAJIPER3 = string.Format("{0:0.00}", gajiper3);
-                    kerjaelaun.TUNGGAKANIND = tunggakan.Select(x => x.HR_TUNGGAKAN_IND).FirstOrDefault();
-                }
-                return Json(kerjaelaun, JsonRequestBehavior.AllowGet);
-            }
-            else if (transaksisambilandetail.Count != 0 && transaksisambilan.Count != 0)
-            {
-                return Maklumat(HR_PEKERJA, tahunbekerja, bulanbekerja, tahundibayar, bulandibayar, tahunbulannotis, tahunbulanbonus, bulankiradari, bulankirahingga, jumlahot, jumlahhari);
+                return Json(kerjaElaun, JsonRequestBehavior.AllowGet);
             }
             return Json(JsonRequestBehavior.AllowGet);
         }
