@@ -47,6 +47,7 @@ namespace eSPP.Models
         public decimal? JumlahGaji { get; set; }
         public decimal? GajiPurata { get; set; }
         public decimal? BonusDiterima { get; set; }
+        public decimal? BonusLayak { get; set; }
         public string Catatan { get; set; }
         public bool IsMuktamad { get; set; }
 
@@ -92,6 +93,7 @@ namespace eSPP.Models
                 d.JumlahGaji = y.HR_JUMLAH_GAJI;
                 d.GajiPurata = y.HR_GAJI_PURATA;
                 d.BonusDiterima = y.HR_BONUS_DITERIMA;
+                d.BonusLayak = y.HR_BONUS_LAYAK;
                 d.Catatan = y.HR_CATATAN;
                 d.MinBulan = y.HR_BULAN_START;
                 d.MaxBulan = y.HR_BULAN_END;
@@ -152,46 +154,132 @@ namespace eSPP.Models
                 det.NoAkaunBank = kerja.HR_NO_AKAUN_BANK;
                 det.NoKWSP = kerja.HR_NO_KWSP;
                 det.TarikhLantikan = kerja.HR_TARIKH_LANTIKAN;
-                
-                det.Jan = elaunlain
-                        .Where(c => c.HR_BULAN_BEKERJA == 1).Sum(c => c.HR_JUMLAH);
-                det.Feb = elaunlain
-                    .Where(c => c.HR_BULAN_BEKERJA == 2).Sum(c => c.HR_JUMLAH);
-                det.Mac = elaunlain
-                    .Where(c => c.HR_BULAN_BEKERJA == 3).Sum(c => c.HR_JUMLAH);
-                det.April = elaunlain
-                    .Where(c => c.HR_BULAN_BEKERJA == 4).Sum(c => c.HR_JUMLAH);
-                det.Mei = elaunlain
-                    .Where(c => c.HR_BULAN_BEKERJA == 5).Sum(c => c.HR_JUMLAH);
-                det.Jun = elaunlain
-                    .Where(c => c.HR_BULAN_BEKERJA == 6).Sum(c => c.HR_JUMLAH);
-                det.Julai = elaunlain
-                    .Where(c => c.HR_BULAN_BEKERJA == 7).Sum(c => c.HR_JUMLAH);
-                det.Ogos = elaunlain
-                    .Where(c => c.HR_BULAN_BEKERJA == 8).Sum(c => c.HR_JUMLAH);
-                det.September = elaunlain
-                    .Where(c => c.HR_BULAN_BEKERJA == 9).Sum(c => c.HR_JUMLAH);
-                det.Oktober = elaunlain
-                    .Where(c => c.HR_BULAN_BEKERJA == 10).Sum(c => c.HR_JUMLAH);
-                det.November = elaunlain
-                    .Where(c => c.HR_BULAN_BEKERJA == 11).Sum(c => c.HR_JUMLAH);
-                det.Disember = elaunlain
-                    .Where(c => c.HR_BULAN_BEKERJA == 12).Sum(c => c.HR_JUMLAH);
-                det.JumlahGaji = elaunlain.Sum(c => c.HR_JUMLAH);
+
+                int totalBulanBerkhidmat = 0;
+
+                det.Jan = GetGajiBersih(db, elaunlain, 1);
+                if(det.Jan > 0)
+                {
+                    totalBulanBerkhidmat++;
+                }
+                det.Feb = GetGajiBersih(db, elaunlain, 2);
+                if (det.Feb > 0)
+                {
+                    totalBulanBerkhidmat++;
+                }
+                det.Mac = GetGajiBersih(db, elaunlain, 3);
+                if (det.Mac > 0)
+                {
+                    totalBulanBerkhidmat++;
+                }
+                det.April = GetGajiBersih(db, elaunlain, 4);
+                if (det.April > 0)
+                {
+                    totalBulanBerkhidmat++;
+                }
+                det.Mei = GetGajiBersih(db, elaunlain, 5);
+                if (det.Mei > 0)
+                {
+                    totalBulanBerkhidmat++;
+                }
+                det.Jun = GetGajiBersih(db, elaunlain, 6);
+                if (det.Jun > 0)
+                {
+                    totalBulanBerkhidmat++;
+                }
+                det.Julai = GetGajiBersih(db, elaunlain, 7);
+                if (det.Julai > 0)
+                {
+                    totalBulanBerkhidmat++;
+                }
+                det.Ogos = GetGajiBersih(db, elaunlain, 8);
+                if (det.Ogos > 0)
+                {
+                    totalBulanBerkhidmat++;
+                }
+                det.September = GetGajiBersih(db, elaunlain, 9);
+                if (det.September > 0)
+                {
+                    totalBulanBerkhidmat++;
+                }
+                det.Oktober = GetGajiBersih(db, elaunlain, 10);
+                if (det.Oktober > 0)
+                {
+                    totalBulanBerkhidmat++;
+                }
+                det.November = GetGajiBersih(db, elaunlain, 11);
+                if (det.November > 0)
+                {
+                    totalBulanBerkhidmat++;
+                }
+                det.Disember = GetGajiBersih(db, elaunlain, 12);
+                if (det.Disember > 0)
+                {
+                    totalBulanBerkhidmat++;
+                }
+                det.JumlahGaji = GetGajiBersihSum(db, elaunlain, startMonth, endMonth);
                 det.MinBulan = startMonth;
                 det.MaxBulan = endMonth;
-                int totalBulan = endMonth - startMonth + 1;
-                if (totalBulan > 0)
+
+                int totalBulanDikira = endMonth - startMonth + 1;
+                if (totalBulanBerkhidmat > 0)
                 {
                     det.GajiPurata = det.JumlahGaji == null ?
-                        0 : decimal.Round(Convert.ToDecimal(det.JumlahGaji) / totalBulan, 3);
+                        0 : decimal.Round(Convert.ToDecimal(det.JumlahGaji) / totalBulanBerkhidmat, 3);
                 }
+                //new changes: 
+                decimal totalGajiPokok = GetSumGajiPokok(elaunlain);
+                decimal bonusLayak = totalGajiPokok / totalBulanDikira;
+                det.BonusLayak = bonusLayak;
+                det.BonusDiterima = bonusLayak * (decimal)1.0;
                 det.IsMuktamad = false;
                 outputList.Add(det);
             }
             //sort by Nama
             outputList = outputList.OrderBy(x => x.Nama).ToList();
             return outputList;
+        }
+
+        //this will be easier if kod potongan sosco masuk dlm transaksi
+        private static decimal GetGajiBersih(ApplicationDbContext db, List<HR_TRANSAKSI_SAMBILAN_DETAIL> elaunList, int bulan)
+        {
+            decimal gajiPokok = elaunList
+                .Where(s => s.HR_KOD_IND == "G" && s.HR_BULAN_BEKERJA == bulan).Sum(c => c.HR_JUMLAH).Value;
+            if(gajiPokok > 0)
+            {
+                decimal elaun = elaunList
+                    .Where(s => s.HR_KOD_IND == "E" && s.HR_BULAN_BEKERJA == bulan).Sum(c => c.HR_JUMLAH).Value;
+                decimal elaunOT = elaunList
+                    .Where(s => s.HR_KOD == "E0164" && s.HR_BULAN_BEKERJA == bulan).Sum(c => c.HR_JUMLAH).Value;
+                decimal potongan = elaunList
+                    .Where(s => s.HR_KOD_IND == "P" && s.HR_BULAN_BEKERJA == bulan).Sum(c => c.HR_JUMLAH).Value;
+                decimal potonganSocso = PageSejarahModel.GetPotonganSocso(db, gajiPokok, elaunOT);
+                decimal gajiBersih = gajiPokok + elaun - potongan - potonganSocso;                
+                return gajiBersih;
+            }
+            else
+            {
+                return gajiPokok;
+            }
+        }
+
+        //this will be easier if kod potongan sosco masuk dlm transaksi
+        private static decimal GetGajiBersihSum(ApplicationDbContext db, List<HR_TRANSAKSI_SAMBILAN_DETAIL> elaunList, int minBulan, int maxBulan)
+        {
+            decimal sumGajiBersih = 0;
+            for(int i = minBulan; i <= maxBulan; i++)
+            {
+                decimal gajiBersihBulan = GetGajiBersih(db, elaunList, i);
+                sumGajiBersih = sumGajiBersih + gajiBersihBulan;
+            }
+            return sumGajiBersih;
+        }
+
+        private static decimal GetSumGajiPokok(List<HR_TRANSAKSI_SAMBILAN_DETAIL> elaunList)
+        {
+            decimal gaji = elaunList
+                .Where(s => s.HR_KOD_IND == "G").Sum(c => c.HR_JUMLAH).Value;
+            return gaji;
         }
     }
 }

@@ -265,7 +265,7 @@
                                         </section>
                                         <section class="col col-lg-4 col-md-4 col-sm-12">
                                             <label class="input">
-                                                @Html.Editor("potongankwsp", new { htmlAttributes = new { @class = "form-control", data_function = "disable" } })
+                                                @Html.Editor("potongankwsp", "{0:00}", new { htmlAttributes = new { @class = "form-control", data_function = "disable" } })
                                             </label>
                                         </section>
                                         <section class="col col-lg-2 col-md-2 col-sm-12">
@@ -959,7 +959,7 @@
                                 tunggakangajikasar.val(data.GAJIKASAR)
                                 tunggakangajisebelumkwsp.val(data.GAJISEBELUMKWSP)
                                 $("#gajisebelumpotongankwspbersamatunggakan").val(data.KIRATUNGGAKAN)
-                                tunggakangajipokok.val(data.GAJIBASIC)
+                                tunggakangajipokok.val(data.GAJIPOKOK)
                                 tunggakanpotongankwsp.val(data.POTONGANKWSP)
                                 tunggakansocso.val(data.POTONGANSOCSO)
                                 tunggakangajibersih.val(data.GAJIBERSIH)

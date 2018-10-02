@@ -77,57 +77,57 @@
                                         @using (Html.BeginForm())
                                         {
                                             @Html.AntiForgeryToken()
-                                        <fieldset>
+                                            <fieldset>
 
-                                            <div class="form-group">
-                                                <label class="control-label col-md-3" for="prepend">Bulan Bekerja (Dari)<font color="red">*</font></label>
-                                                <div class="col-md-9">
-                                                    <div class="row">
-                                                        <div class="col-sm-12">
-                                                            <label class="input">
-                                                                <input class="form-control" name="bulanBekerja" maxlength="2" placeholder="--">
-                                                                <label class="note">
-                                                                    Bulan mula bekerja
+                                                <div class="form-group">
+                                                    <label class="control-label col-md-3" for="prepend">Bulan Bekerja (Dari)<font color="red">*</font></label>
+                                                    <div class="col-md-9">
+                                                        <div class="row">
+                                                            <div class="col-sm-12">
+                                                                <label class="input">
+                                                                    <input class="form-control" name="bulanBekerja" maxlength="2" placeholder="--">
+                                                                    <label class="note">
+                                                                        Bulan mula bekerja
+                                                                    </label>
                                                                 </label>
-                                                            </label>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="control-label col-md-3" for="prepend">Bulan Bekerja (hingga)<font color="red">*</font></label>
-                                                <div class="col-md-9">
-                                                    <div class="row">
-                                                        <div class="col-sm-12">
-                                                            <label class="input">
-                                                                <input class="form-control" name="bulanBekerjaHingga" maxlength="2" placeholder="--">
-                                                                <label class="note">
-                                                                    Bulan tamat bekerja
+                                                <div class="form-group">
+                                                    <label class="control-label col-md-3" for="prepend">Bulan Bekerja (hingga)<font color="red">*</font></label>
+                                                    <div class="col-md-9">
+                                                        <div class="row">
+                                                            <div class="col-sm-12">
+                                                                <label class="input">
+                                                                    <input class="form-control" name="bulanBekerjaHingga" maxlength="2" placeholder="--">
+                                                                    <label class="note">
+                                                                        Bulan tamat bekerja
+                                                                    </label>
                                                                 </label>
-                                                            </label>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="control-label col-md-3" for="prepend">Bulan Dibayar<font color="red">*</font></label>
-                                                <div class="col-md-9">
-                                                    <div class="row">
-                                                        <div class="col-sm-12">
-                                                            <label class="input">
-                                                                <input class="form-control" name="bulanDibayar" maxlength="2" placeholder="--">
-                                                                <label class="note">
-                                                                    Bulan bonus dibayar
+                                                <div class="form-group">
+                                                    <label class="control-label col-md-3" for="prepend">Bulan Dibayar<font color="red">*</font></label>
+                                                    <div class="col-md-9">
+                                                        <div class="row">
+                                                            <div class="col-sm-12">
+                                                                <label class="input">
+                                                                    <input class="form-control" name="bulanDibayar" maxlength="2" placeholder="--">
+                                                                    <label class="note">
+                                                                        Bulan bonus dibayar
+                                                                    </label>
                                                                 </label>
-                                                            </label>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div>
-                                                <input type="hidden" class="form-control" name="tahunDibayar" maxlength="4">
-                                            </div>
-                                        </fieldset>
+                                                <div>
+                                                    <input type="hidden" class="form-control" name="tahunDibayar" maxlength="4">
+                                                </div>
+                                            </fieldset>
 
                                             <div class="form-actions">
                                                 <div class="row">
@@ -143,6 +143,21 @@
                                 </div>
                             </div>
                             <br />
+                            <div id="divDropdown" class="pull-right">
+                                @using (Html.BeginForm("TambahGandaan", "KakitanganSambilan"))
+                                {
+                                    <input type="hidden" name="bulanBekerja" value="@ViewBag.MinBulan" />
+                                    <input type="hidden" name="bulanDibayar" value="@ViewBag.MaxBulan" />
+                                    <input type="hidden" name="tahunDibayar" value="@ViewBag.MaxTahun" />
+                                    <select id="gandaan" name="gandaan" class="form-control">
+                                        <option value="0.5" selected="selected">1/2 Bulan</option>
+                                        <option value="1">1 Bulan</option>
+                                        <option value="1.5">1 1/2 Bulan</option>
+                                        <option value="2">2 Bulan</option>
+                                    </select>
+                                    <input type="submit" value="Testing" class="btn btn-default"/>
+                                }
+                            </div>
                             <div id="showtable">
                                 <!-- TODO -->
                                 @if (Model.Count() > 0)
@@ -169,7 +184,8 @@
                                                 }
                                                 <th>Jumlah</th>
                                                 <th>Purata</th>
-                                                <th>Bonus</th>
+                                                <th>Bonus Layak</th>
+                                                <th>Bonus Diterima</th>
                                                 <th>Catatan</th>
                                                 @*<th>Muktamad</th>*@
                                             </tr>
@@ -177,127 +193,115 @@
                                         <tbody>
                                             @foreach (BonusSambilanDetailModel x in Model)
                                             {
-                                                <tr>
-                                                    <td>@x.Nama</td>
-                                                    <td>@x.NoPekerja</td>
-                                                    <td>@x.NoKadPengenalan</td>
-                                                    <td>@x.NoAkaunBank</td>
-                                                    <td>@x.NoKWSP</td>
-                                                    <td>@x.TarikhLantikanString</td>
-                                                    @for (int m = ViewBag.MinBulan; m <= ViewBag.MaxBulan; m++)
+                                            <tr>
+                                                <td>@x.Nama</td>
+                                                <td>@x.NoPekerja</td>
+                                                <td>@x.NoKadPengenalan</td>
+                                                <td>@x.NoAkaunBank</td>
+                                                <td>@x.NoKWSP</td>
+                                                <td>@x.TarikhLantikanString</td>
+                                                @for (int m = ViewBag.MinBulan; m <= ViewBag.MaxBulan; m++)
+                                                {
+                                                    BonusSambilanMonthModel monthModel =
+                                                        new BonusSambilanMonthModel
+                                                        {
+                                                            MonthNumber = m,
+                                                            Nombor = m
+                                                        };
+                                                    switch (monthModel.MonthNumber)
                                                     {
-                                                        BonusSambilanMonthModel monthModel =
-                                                            new BonusSambilanMonthModel
-                                                            {
-                                                                MonthNumber = m,
-                                                                Nombor = m
-                                                            };
-                                                        switch (monthModel.MonthNumber)
-                                                        {
-                                                            case (1):
-                                                                <td>@x.Jan</td>
-                                                                break;
-                                                            case (2):
-                                                                <td>@x.Feb</td>
-                                                                break;
-                                                            case (3):
-                                                                <td>@x.Mac</td>
-                                                                break;
-                                                            case (4):
-                                                                <td>@x.April</td>
-                                                                break;
-                                                            case (5):
-                                                                <td>@x.Mei</td>
-                                                                break;
-                                                            case (6):
-                                                                <td>@x.Jun</td>
-                                                                break;
-                                                            case (7):
-                                                                <td>@x.Julai</td>
-                                                                break;
-                                                            case (8):
-                                                                <td>@x.Ogos</td>
-                                                                break;
-                                                            case (9):
-                                                                <td>@x.September</td>
-                                                                break;
-                                                            case (10):
-                                                                <td>@x.Oktober</td>
-                                                                break;
-                                                            case (11):
-                                                                <td>@x.November</td>
-                                                                break;
-                                                            case (12):
-                                                                <td>@x.Disember</td>
-                                                                break;
-                                                        }
+                                                        case (1):
+                                                            <td>@x.Jan</td>
+                                                            break;
+                                                        case (2):
+                                                            <td>@x.Feb</td>
+                                                            break;
+                                                        case (3):
+                                                            <td>@x.Mac</td>
+                                                            break;
+                                                        case (4):
+                                                            <td>@x.April</td>
+                                                            break;
+                                                        case (5):
+                                                            <td>@x.Mei</td>
+                                                            break;
+                                                        case (6):
+                                                            <td>@x.Jun</td>
+                                                            break;
+                                                        case (7):
+                                                            <td>@x.Julai</td>
+                                                            break;
+                                                        case (8):
+                                                            <td>@x.Ogos</td>
+                                                            break;
+                                                        case (9):
+                                                            <td>@x.September</td>
+                                                            break;
+                                                        case (10):
+                                                            <td>@x.Oktober</td>
+                                                            break;
+                                                        case (11):
+                                                            <td>@x.November</td>
+                                                            break;
+                                                        case (12):
+                                                            <td>@x.Disember</td>
+                                                            break;
                                                     }
-                                                    <td>@x.JumlahGaji</td>
-                                                    <td>@x.GajiPurata</td>
-                                                    <td>
-                                                        <span>
-                                                            @if (x.BonusDiterima == null)
-                                                            {
-                                                                <!-- bonus diterima -->
-                                                                <input type="button" class="btn btn-default" name="btnBonus"
-                                                                       value="0.00"
-                                                                       data-month="@x.BulanBonus.ToString("D2")"
-                                                                       data-year="@x.TahunBonus.ToString()"
-                                                                       data-pekerja="@x.NoPekerja" />
-                                                            }
-                                                            else
-                                                            {
-                                                                <!-- bonus diterima -->
-                                                                <input type="button" class="btn btn-default" name="btnBonus"
-                                                                       value="@x.BonusDiterima.Value.ToString("0.00")"
-                                                                       data-month="@x.BulanBonus.ToString("D2")"
-                                                                       data-year="@x.TahunBonus.ToString()"
-                                                                       data-pekerja="@x.NoPekerja" />
-                                                            }
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        @if (string.IsNullOrEmpty(x.Catatan))
-                                                        {
-                                                            <!-- catatan-->
-                                                            <a name="btnCatatan"
-                                                               href='#'
-                                                               data-month="@x.BulanBonus.ToString("D2")"
-                                                               data-year="@x.TahunBonus.ToString()"
-                                                               data-pekerja="@x.NoPekerja"
-                                                               data-catatan="@x.Catatan"
-                                                               title="Catatan">Klik</a>
-                                                        }
-                                                        else
-                                                        {
-                                                            <!-- catatan-->
-                                                            <a name="btnCatatan"
-                                                               href='#'
-                                                               data-month="@x.BulanBonus.ToString("D2")"
-                                                               data-year="@x.TahunBonus.ToString()"
-                                                               data-pekerja="@x.NoPekerja"
-                                                               data-catatan="@x.Catatan"
-                                                               title="Catatan">@x.Catatan</a>
-                                                        }
-                                                    </td>
-                                                    @*<td>
-                                                            @if (x.IsMuktamad)
-                                                            {
-                                                                <button class="btn btn-xs btn-default btn-circle" disabled title="Transaksi Sambilan"><i class="fa fa-money"></i></button>
-                                                            }
-                                                            else
-                                                            {
-                                                                <a class="btn btn-xs btn-default btn-circle" title="Muktamad"
-                                                                   href='@Url.Action("UpdateMuktamad", "KakitanganSambilan",
-                                                            new { noPekerja = x.NoPekerja,
-                                                                tahunBonus = x.TahunBonus,
-                                                                bulanBonus = x.BulanBonus})'>
-                                                                    <i class="fa fa-money"></i>
-                                                                </a>
-                                                            }
+                                                }
+                                                <td>@x.JumlahGaji</td>
+                                                <td>@x.GajiPurata</td>
+                                                <td>
+                                                    <span>
+                                                        @x.BonusLayak.Value.ToString("0.00")
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span>
+                                                        @x.BonusDiterima.Value.ToString("0.00")
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    @if (string.IsNullOrEmpty(x.Catatan))
+                                                    {
+                                                        <!-- catatan-->
+                                                        <a name="btnCatatan"
+                                                           href='#'
+                                                           data-month="@x.BulanBonus.ToString("D2")"
+                                                           data-year="@x.TahunBonus.ToString()"
+                                                           data-pekerja="@x.NoPekerja"
+                                                           data-catatan="@x.Catatan"
+                                                           title="Catatan">Klik</a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <!-- catatan-->
+                                                        <a name="btnCatatan"
+                                                           href='#'
+                                                           data-month="@x.BulanBonus.ToString("D2")"
+                                                           data-year="@x.TahunBonus.ToString()"
+                                                           data-pekerja="@x.NoPekerja"
+                                                           data-catatan="@x.Catatan"
+                                                           title="Catatan">@x.Catatan</a>
+                                                    }
+                                                </td>
+                                                @*<td>
+            @if (x.IsMuktamad)
+            {
+                <button class="btn btn-xs btn-default btn-circle" disabled title="Transaksi Sambilan"><i class="fa fa-money"></i></button>
+            }
+            else
+            {
+                <a class="btn btn-xs btn-default btn-circle" title="Muktamad"
+                   href='@Url.Action("UpdateMuktamad", "KakitanganSambilan",
+            new { noPekerja = x.NoPekerja,
+                tahunBonus = x.TahunBonus,
+                bulanBonus = x.BulanBonus})'>
+                    <i class="fa fa-money"></i>
+                </a>
+            }
 
-                                                        </td>*@
-                                                </tr>
+        </td>*@
+                                            </tr>
                                             }
                                         </tbody>
                                     </table>
@@ -308,25 +312,25 @@
                         <!-- end widget content -->
                         @if (Model.Count() > 0)
                         {
-                        <footer>
-                            @using (Html.BeginForm())
-                            {
-                                <input type="hidden" name="bulanBekerja" value="@ViewBag.MinBulan" />
-                                <input type="hidden" name="bulanDibayar" value="@ViewBag.MaxBulan" />
-                                <input type="hidden" name="tahunDibayar" value="@ViewBag.MaxTahun" />
-                                @*<input type="hidden" name="isTemp" value="yes" />*@
-                                <p>
-                                    <button type="submit" class="btn btn-warning pull-right" id="Batal" name="Command" value="Batal">
-                                        <i class="fa fa-minus"></i> Batal
-                                    </button>
-                                    <button type="submit" class="btn btn-success pull-right" id="Tambah" name="Command" value="Tambah">
-                                        <i class="fa fa-plus"></i> Tambah
-                                    </button>
-                                    <br />
-                                    <br />
-                                </p>
-                            }
-                        </footer>
+                            <footer>
+                                @using (Html.BeginForm())
+                                {
+                                    <input type="hidden" name="bulanBekerja" value="@ViewBag.MinBulan" />
+                                    <input type="hidden" name="bulanDibayar" value="@ViewBag.MaxBulan" />
+                                    <input type="hidden" name="tahunDibayar" value="@ViewBag.MaxTahun" />
+                                    @*<input type="hidden" name="isTemp" value="yes" />*@
+                                    <p>
+                                        <button type="submit" class="btn btn-warning pull-right" id="Batal" name="Command" value="Batal">
+                                            <i class="fa fa-minus"></i> Batal
+                                        </button>
+                                        <button type="submit" class="btn btn-success pull-right" id="Tambah" name="Command" value="Tambah">
+                                            <i class="fa fa-plus"></i> Tambah
+                                        </button>
+                                        <br />
+                                        <br />
+                                    </p>
+                                }
+                            </footer>
                         }
                     </div>
                     <!-- end widget div -->
@@ -390,7 +394,7 @@
     <script type="text/javascript">
         $(document).ready(function () {
             UpdateInput();
-            KlikBonus();
+            //KlikBonus();
             KlikCatatan();
         });
 

@@ -367,7 +367,7 @@ namespace eSPP.Controllers
                 return RedirectToAction("TambahBonus",
                     new { month = bulanDibayar, year = tahunDibayar });
             }
-            else
+            else //preview ("Pratonton")
             {
                 List<BonusSambilanDetailModel> bonus = new List<BonusSambilanDetailModel>();
                 ViewBag.MinBulan = 0;
@@ -418,6 +418,13 @@ namespace eSPP.Controllers
                 return RedirectToAction("UrusBonus", "PengurusanKakitanganSambilan", new { tahunbekerja  = tahunBonus});
             }
 
+        }
+
+        public ActionResult TambahGandaan(string bulanBekerja, string bulanDibayar, string tahunDibayar, string gandaan)
+        {
+            string aaa = gandaan;
+            return RedirectToAction("TambahBonus",
+                    new { month = bulanDibayar, year = tahunDibayar });
         }
     }
 }

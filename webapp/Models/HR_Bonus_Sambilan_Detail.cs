@@ -42,6 +42,8 @@ namespace eSPP.Models
         public Nullable<decimal> HR_JUMLAH_GAJI { get; set; }
         public Nullable<decimal> HR_GAJI_PURATA { get; set; }
         public Nullable<decimal> HR_BONUS_DITERIMA { get; set; }
+        public Nullable<decimal> HR_BONUS_LAYAK { get; set; }
+
 
         public int HR_BULAN_START { get; set; }
         public int HR_BULAN_END { get; set; }
@@ -154,6 +156,8 @@ namespace eSPP.Models
                         HR_DISEMBER = bonus.Disember,
                         HR_JUMLAH_GAJI = bonus.JumlahGaji,
                         HR_GAJI_PURATA = bonus.GajiPurata,
+
+                        HR_BONUS_LAYAK = bonus.BonusLayak,
                         HR_BONUS_DITERIMA = bonus.BonusDiterima,
                         HR_CATATAN = bonus.Catatan,
                         HR_BULAN_START = bonus.MinBulan,
@@ -185,6 +189,7 @@ namespace eSPP.Models
                     det.HR_DISEMBER = bonus.Disember;
                     det.HR_JUMLAH_GAJI = bonus.JumlahGaji;
                     det.HR_GAJI_PURATA = bonus.GajiPurata;
+                    det.HR_BONUS_LAYAK = bonus.BonusLayak;
                     det.HR_BONUS_DITERIMA = bonus.BonusDiterima;
                     det.HR_CATATAN = bonus.Catatan;
                     det.HR_BULAN_START = bonus.MinBulan;
