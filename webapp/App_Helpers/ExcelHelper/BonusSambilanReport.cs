@@ -140,7 +140,7 @@ namespace eSPP.App_Helpers.ExcelHelper
                 sheet1.AutoSizeColumn(jcol);
             }
             int colStart_monthDiff = columnStart + 6 + monthDiff;
-            for (int kcol = colStart_monthDiff; kcol <= colStart_monthDiff + 3; kcol++)
+            for (int kcol = colStart_monthDiff; kcol <= colStart_monthDiff + 4; kcol++)
             {
                 ICell nCell = nRow.CreateCell(kcol);
                 nCell.CellStyle = alignCenter;
@@ -154,9 +154,13 @@ namespace eSPP.App_Helpers.ExcelHelper
                 }
                 else if (kcol == colStart_monthDiff + 2)
                 {
-                    nCell.SetCellValue("BONUS");
+                    nCell.SetCellValue("BONUS LAYAK");
                 }
                 else if (kcol == colStart_monthDiff + 3)
+                {
+                    nCell.SetCellValue("BONUS DITERIMA");
+                }
+                else if (kcol == colStart_monthDiff + 4)
                 {
                     nCell.SetCellValue("CATATAN");
                 }               
@@ -229,7 +233,7 @@ namespace eSPP.App_Helpers.ExcelHelper
                 sheet1.AutoSizeColumn(jcol);
             }
             int colStart_monthDiff = columnStart + 6 + monthDiff;
-            for (int kcol = colStart_monthDiff; kcol <= colStart_monthDiff + 3; kcol++)
+            for (int kcol = colStart_monthDiff; kcol <= colStart_monthDiff + 4; kcol++)
             {
                 ICell nCell = nRow.CreateCell(kcol);
                 nCell.CellStyle = alignCenter;
@@ -245,6 +249,21 @@ namespace eSPP.App_Helpers.ExcelHelper
                 {
                     try
                     {
+                        if (data.BonusLayak != null)
+                        {
+                            //always show 2 dec places
+                            nCell.SetCellValue(data.BonusLayak.Value.ToString("0.00"));
+                        }
+                    }
+                    catch
+                    {
+                        nCell.SetCellValue("0.00");
+                    }
+                }
+                else if (kcol == colStart_monthDiff + 3)
+                {
+                    try
+                    {
                         if(data.BonusDiterima != null)
                         {
                             //always show 2 dec places
@@ -256,7 +275,7 @@ namespace eSPP.App_Helpers.ExcelHelper
                         nCell.SetCellValue("0.00");
                     }
                 }
-                else if (kcol == colStart_monthDiff + 3)
+                else if (kcol == colStart_monthDiff + 4)
                 {
                     nCell.SetCellValue(data.Catatan);
                 }

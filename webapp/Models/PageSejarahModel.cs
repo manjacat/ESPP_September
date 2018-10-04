@@ -331,7 +331,7 @@ namespace eSPP.Models
                         .Where(s => s.HR_NO_PEKERJA == HR_PEKERJA).ToList();
 
             //Caruman Pekerja = Kira dari Gaji POKOK? or Kira dari Gaji POKOK + elaun
-            decimal gajipokok = decimal.Round(gajiPokok,2);
+            decimal gajipokok = decimal.Round(gajiPokok, 2);
             HR_KWSP kwsp = db.HR_KWSP
                .Where(s => gajipokok >= s.HR_UPAH_DARI
                && gajipokok <= s.HR_UPAH_HINGGA).SingleOrDefault();
@@ -364,7 +364,7 @@ namespace eSPP.Models
             HR_MAKLUMAT_PEKERJAAN mpekerjaan = db.HR_MAKLUMAT_PEKERJAAN
                 .Where(s => s.HR_NO_PEKERJA == HR_PEKERJA).FirstOrDefault();
             decimal gajiSehari = 54.00M;
-            if(mpekerjaan != null)
+            if (mpekerjaan != null)
             {
                 // kalau gred > 19, gaji RM54
                 // kalau gaji < 19, gaji RM72
@@ -386,11 +386,20 @@ namespace eSPP.Models
         public static decimal GetPotonganSocso(ApplicationDbContext db, decimal gajiPokok, decimal elaunOT)
         {
             decimal gajiKasar = gajiPokok + elaunOT;
+            try
+            {
+                //fix issue userSocso keluar error kalau user taip hari = 1
+                HR_SOCSO userSocso = db.HR_SOCSO.Where(s => s.HR_GAJI_DARI <= gajiKasar
+                   && gajiKasar <= s.HR_GAJI_HINGGA).SingleOrDefault();
 
-            HR_SOCSO userSocso = db.HR_SOCSO.Where(s => s.HR_GAJI_DARI <= gajiKasar
-                       && gajiKasar <= s.HR_GAJI_HINGGA).SingleOrDefault();
+                return userSocso.HR_JUMLAH;
+            }
+            catch (Exception ex)
+            {   
+                Console.WriteLine(ex.ToString());
+                return 0;
+            }
 
-            return userSocso.HR_JUMLAH;
         }
 
         public static PageSejarahModel Insert(PageSejarahModel agree, string user, string command)
