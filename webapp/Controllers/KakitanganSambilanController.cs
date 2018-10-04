@@ -213,6 +213,7 @@ namespace eSPP.Controllers
             ViewBag.MinBulan = 0;
             ViewBag.MaxBulan = 0;
             ViewBag.MaxTahun = 0;
+            ViewBag.BulanBonus = 0;
             List<BonusSambilanDetailModel> list = new List<BonusSambilanDetailModel>();
             try
             {
@@ -231,6 +232,7 @@ namespace eSPP.Controllers
                 ViewBag.MinBulan = list.Select(x => x.MinBulan).Min();
                 ViewBag.MaxBulan = monthInt;
                 ViewBag.MaxTahun = yearInt;
+                ViewBag.BulanBonus = monthInt;
             }
             catch
             {
@@ -344,6 +346,7 @@ namespace eSPP.Controllers
                 int endMonth = bonus.Select(x => x.MaxBulan).FirstOrDefault();
                 ViewBag.MinBulan = startMonth;
                 ViewBag.MaxBulan = endMonth;
+                ViewBag.BulanBonus = month;
                 ViewBag.MaxTahun = yearInt;
                 return View(bonus);
             }
@@ -373,6 +376,7 @@ namespace eSPP.Controllers
                 ViewBag.MinBulan = 0;
                 ViewBag.MaxBulan = 0;
                 ViewBag.MaxTahun = 0;
+                ViewBag.BulanBonus = 0;
                 try
                 {
                     int startMonth = Convert.ToInt32(bulanBekerja);
@@ -381,6 +385,7 @@ namespace eSPP.Controllers
                     int year = Convert.ToInt32(tahunDibayar);
                     ViewBag.MinBulan = startMonth;
                     ViewBag.MaxBulan = endMonth;
+                    ViewBag.BulanBonus = month;
                     ViewBag.MaxTahun = year;
                     bonus = BonusSambilanDetailModel.GetDetailsFromTransaksi(startMonth, month, year, endMonth);
                     if (bonus.Count() > 0)
@@ -420,11 +425,41 @@ namespace eSPP.Controllers
 
         }
 
-        public ActionResult TambahGandaan(string bulanBekerja, string bulanDibayar, string tahunDibayar, string gandaan)
+        [HttpPost]
+        public ActionResult TambahGandaan
+            (string gandaan, string bulanBonus,
+            string tahunBonus, string isTemp = "")
         {
-            string aaa = gandaan;
-            return RedirectToAction("TambahBonus",
-                    new { month = bulanDibayar, year = tahunDibayar });
+            ManageMessageId outputMsg;
+            try
+            {
+                int month = Convert.ToInt32(bulanBonus);
+                int year = Convert.ToInt32(tahunBonus);
+                decimal multiply = Convert.ToDecimal(gandaan);
+                HR_BONUS_SAMBILAN_DETAIL.UpdateBonusDiterima(month, year, multiply);
+                outputMsg = ManageMessageId.Kemaskini;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                outputMsg = ManageMessageId.Error;
+            }
+
+            if (!string.IsNullOrEmpty(isTemp))
+            {
+                return RedirectToAction("TambahBonus",
+                    new
+                    {
+                        month = bulanBonus,
+                        year = tahunBonus,
+                        message = outputMsg,
+                        isTemp = "yes"
+                    });
+            }
+            else
+            {
+                return RedirectToAction("BonusSambilanDetail", new { month = bulanBonus, year = tahunBonus, message = outputMsg });
+            }
         }
     }
 }

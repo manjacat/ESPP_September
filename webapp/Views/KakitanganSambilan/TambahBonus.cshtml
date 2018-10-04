@@ -146,16 +146,16 @@
                             <div id="divDropdown" class="pull-right">
                                 @using (Html.BeginForm("TambahGandaan", "KakitanganSambilan"))
                                 {
-                                    <input type="hidden" name="bulanBekerja" value="@ViewBag.MinBulan" />
-                                    <input type="hidden" name="bulanDibayar" value="@ViewBag.MaxBulan" />
-                                    <input type="hidden" name="tahunDibayar" value="@ViewBag.MaxTahun" />
+                                    <input id="bulanDialog1" type="hidden" name="bulanBonus" value="@ViewBag.BulanBonus" />
+                                    <input id="tahunDialog1" type="hidden" name="tahunBonus" value="@ViewBag.MaxTahun" />
+                                    <input type="hidden" name="isTemp" value="yes" />
                                     <select id="gandaan" name="gandaan" class="form-control">
                                         <option value="0.5" selected="selected">1/2 Bulan</option>
                                         <option value="1">1 Bulan</option>
                                         <option value="1.5">1 1/2 Bulan</option>
                                         <option value="2">2 Bulan</option>
                                     </select>
-                                    <input type="submit" value="Testing" class="btn btn-default"/>
+                                    <input type="submit" value="Gandaan" class="btn btn-default" />
                                 }
                             </div>
                             <div id="showtable">
@@ -313,12 +313,11 @@
                         @if (Model.Count() > 0)
                         {
                             <footer>
-                                @using (Html.BeginForm())
+                                @using (Html.BeginForm()) //call TambahBonus
                                 {
                                     <input type="hidden" name="bulanBekerja" value="@ViewBag.MinBulan" />
                                     <input type="hidden" name="bulanDibayar" value="@ViewBag.MaxBulan" />
                                     <input type="hidden" name="tahunDibayar" value="@ViewBag.MaxTahun" />
-                                    @*<input type="hidden" name="isTemp" value="yes" />*@
                                     <p>
                                         <button type="submit" class="btn btn-warning pull-right" id="Batal" name="Command" value="Batal">
                                             <i class="fa fa-minus"></i> Batal

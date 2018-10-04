@@ -51,11 +51,18 @@ namespace eSPP.Models
 
                 HR_MAKLUMAT_PEKERJAAN mpekerjaan = db.HR_MAKLUMAT_PEKERJAAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA).SingleOrDefault();
 
+                AgreementModels kerjaelaun = new AgreementModels();
+
                 //if (transaksisambilandetail.Count != 0 && transaksisambilan.Count != 0)
                 if (userTransaksiDetail.Count != 0)
                 {
+
                     //kalau ada tranaksi, ambik gaji dan potongan dari tranasksi
+                    decimal gajiSehari = PageSejarahModel.GetGajiSehari(db, HR_PEKERJA);
                     HR_TRANSAKSI_SAMBILAN_DETAIL gaji = userTransaksiDetail.SingleOrDefault(s => s.HR_KOD_IND == "G");
+                    kerjaelaun.GAJISEHARI = gajiSehari.ToString("0.00");
+                    kerjaelaun.GAJIPOKOK = gaji.HR_JUMLAH;                   
+                    kerjaelaun.GAJIPER3 = (gaji.HR_JUMLAH / 3).Value.ToString("0.00");
 
                     //elaun
                     List<HR_TRANSAKSI_SAMBILAN_DETAIL> elaunka = userTransaksiDetail
@@ -71,32 +78,14 @@ namespace eSPP.Models
                         .Where(s => s.HR_KOD == "P0015").ToList();
                     List<HR_TRANSAKSI_SAMBILAN_DETAIL> potonganlain = userTransaksiDetail
                         .Where(s => s.HR_KOD_IND == "P" && (s.HR_KOD != "P0015" && s.HR_KOD != "P0035")).ToList();
-                    HR_MAKLUMAT_ELAUN_POTONGAN potonganKWSP = PageSejarahModel.GetPotonganKWSP(db, HR_PEKERJA);
-
-                    List<HR_KWSP> listkwsp = db.HR_KWSP.ToList();
-                    AgreementModels kerjaelaun = new AgreementModels();
-                    
+                    HR_MAKLUMAT_ELAUN_POTONGAN potonganKWSP = PageSejarahModel.GetPotonganKWSP(db, HR_PEKERJA, kerjaelaun.GAJIPOKOK.Value);
+                                                            
                     kerjaelaun.JABATAN = userJabatan.GE_KETERANGAN_JABATAN;
                     kerjaelaun.BAHAGIAN = userBahagian.GE_KETERANGAN;
                     kerjaelaun.NOKP = userPeribadi.HR_NO_KPBARU;
                     kerjaelaun.JAWATAN = jawatan.HR_NAMA_JAWATAN;
-
-                    decimal gajiSehari = PageSejarahModel.GetGajiSehari(db, HR_PEKERJA);
-                    kerjaelaun.GAJISEHARI = gajiSehari.ToString("0.00");
-                    //gaji bersih = gaji pokok + elaun
-                    kerjaelaun.GAJIPOKOK = gaji.HR_JUMLAH;
-                    var gajikasar = gaji.HR_JUMLAH
-                        + elaunka.Sum(s => s.HR_JUMLAH)
-                        + elaunlain.Sum(s => s.HR_JUMLAH)
-                        + elaunot.Sum(s => s.HR_JUMLAH);
-                    kerjaelaun.GAJIKASAR = gajikasar.Value.ToString("0.00");
-                    //double? gajikasar1 = (double)gajikasar * 0.11;                  
-                    kerjaelaun.GAJIPER3 = (gaji.HR_JUMLAH / 3).Value.ToString("0.00");
-                   
-                   
                     kerjaelaun.JAMBEKERJA = elaunot.SingleOrDefault().HR_JAM_HARI;
-                    kerjaelaun.HARIBEKERJA = gaji.HR_JAM_HARI;
-                    
+                    kerjaelaun.HARIBEKERJA = gaji.HR_JAM_HARI;                    
 
                     //elaun
                     kerjaelaun.ELAUNKA = elaunka.Sum(s => s.HR_JUMLAH).Value.ToString("0.00");
@@ -113,6 +102,12 @@ namespace eSPP.Models
                     kerjaelaun.TUNGGAKANIND = userTransaksiDetail
                         .Where(s => s.HR_KOD == "GAJPS").SingleOrDefault().HR_TUNGGAKAN_IND;
 
+                    //calculation
+                    var gajikasar = gaji.HR_JUMLAH
+                       + elaunka.Sum(s => s.HR_JUMLAH)
+                       + elaunlain.Sum(s => s.HR_JUMLAH)
+                       + elaunot.Sum(s => s.HR_JUMLAH);
+                    kerjaelaun.GAJIKASAR = gajikasar.Value.ToString("0.00");
                     var gajiSebelumKWSP = gajikasar
                       - potonganSocso
                       - potonganksdk.Sum(s => s.HR_JUMLAH)
@@ -135,20 +130,20 @@ namespace eSPP.Models
                 }
                 else if (userTransaksiDetail.Count == 0)
                 {
-                    List<HR_MAKLUMAT_ELAUN_POTONGAN> potonganksdk = PageSejarahModel.GetPotonganKSDK(db, HR_PEKERJA);
-                    List<HR_MAKLUMAT_ELAUN_POTONGAN> potonganlain = PageSejarahModel.GetPotonganLain(db, HR_PEKERJA);
-                    HR_MAKLUMAT_ELAUN_POTONGAN potonganKWSP = PageSejarahModel.GetPotonganKWSP(db, HR_PEKERJA);
-                    List<HR_MAKLUMAT_ELAUN_POTONGAN> elaunka = PageSejarahModel.GetElaunKa(db, HR_PEKERJA);
-                    List<HR_MAKLUMAT_ELAUN_POTONGAN> elaunLain = PageSejarahModel.GetElaunLain(db, HR_PEKERJA);
-
-                    AgreementModels kerjaelaun = new AgreementModels();
-                    decimal gajiPokok = PageSejarahModel.GetGajiPokok(db, HR_PEKERJA);
-                    kerjaelaun.GAJIPOKOK = gajiPokok;                    
+                    //gaji related
+                    var gajiSehari = PageSejarahModel.GetGajiSehari(db, HR_PEKERJA);
+                    kerjaelaun.GAJISEHARI = gajiSehari.ToString("0.00");
+                    decimal gajiPokok = PageSejarahModel.GetGajiPokok(db, HR_PEKERJA, jumlahhari.Value);
+                    kerjaelaun.GAJIPOKOK = gajiPokok;
                     decimal? gajiper3 = kerjaelaun.GAJIPOKOK / 3;
                     kerjaelaun.GAJIPER3 = gajiper3.Value.ToString("0.00");
-                    var gajiSehari = PageSejarahModel.GetGajiSehari(db, HR_PEKERJA);
-                    kerjaelaun.GAJISEHARI = gajiSehari.ToString("0.00");                    
 
+                    List<HR_MAKLUMAT_ELAUN_POTONGAN> potonganksdk = PageSejarahModel.GetPotonganKSDK(db, HR_PEKERJA);
+                    List<HR_MAKLUMAT_ELAUN_POTONGAN> potonganlain = PageSejarahModel.GetPotonganLain(db, HR_PEKERJA);
+                    HR_MAKLUMAT_ELAUN_POTONGAN potonganKWSP = PageSejarahModel.GetPotonganKWSP(db, HR_PEKERJA, kerjaelaun.GAJIPOKOK.Value);
+                    List<HR_MAKLUMAT_ELAUN_POTONGAN> elaunka = PageSejarahModel.GetElaunKa(db, HR_PEKERJA);
+                    List<HR_MAKLUMAT_ELAUN_POTONGAN> elaunLain = PageSejarahModel.GetElaunLain(db, HR_PEKERJA);
+                    
                     //semua Elaun
                     int jumlahHariInt = Convert.ToInt32(jumlahhari != null ? jumlahhari : 0);
                     decimal jumlahJamOT = Convert.ToDecimal(jumlahot != null ? jumlahot : 0);

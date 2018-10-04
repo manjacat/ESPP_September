@@ -313,16 +313,16 @@ namespace eSPP.Models
             return potonganlain;
         }
 
-        public static List<HR_MAKLUMAT_ELAUN_POTONGAN> GetPotonganSemua(ApplicationDbContext db, string HR_PEKERJA)
+        public static List<HR_MAKLUMAT_ELAUN_POTONGAN> GetPotonganSemua(ApplicationDbContext db, string HR_PEKERJA, decimal gajiPokok)
         {
             List<HR_MAKLUMAT_ELAUN_POTONGAN> potonganSemua = new List<HR_MAKLUMAT_ELAUN_POTONGAN>();
             potonganSemua.AddRange(GetPotonganKSDK(db, HR_PEKERJA));
-            potonganSemua.Add(GetPotonganKWSP(db, HR_PEKERJA));
+            potonganSemua.Add(GetPotonganKWSP(db, HR_PEKERJA, gajiPokok));
             potonganSemua.AddRange(GetPotonganLain(db, HR_PEKERJA));
             return potonganSemua;
         }
 
-        public static HR_MAKLUMAT_ELAUN_POTONGAN GetPotonganKWSP(ApplicationDbContext db, string HR_PEKERJA)
+        public static HR_MAKLUMAT_ELAUN_POTONGAN GetPotonganKWSP(ApplicationDbContext db, string HR_PEKERJA, decimal gajiPokok)
         {
             //HR_MAKLUMAT_ELAUN_POTONGAN userCaruman = db.HR_MAKLUMAT_ELAUN_POTONGAN
             //            .Where(s => s.HR_NO_PEKERJA == HR_PEKERJA && s.HR_ELAUN_POTONGAN_IND == "C").First();
@@ -331,7 +331,7 @@ namespace eSPP.Models
                         .Where(s => s.HR_NO_PEKERJA == HR_PEKERJA).ToList();
 
             //Caruman Pekerja = Kira dari Gaji POKOK? or Kira dari Gaji POKOK + elaun
-            decimal gajipokok = GetGajiPokok(db, HR_PEKERJA);
+            decimal gajipokok = decimal.Round(gajiPokok,2);
             HR_KWSP kwsp = db.HR_KWSP
                .Where(s => gajipokok >= s.HR_UPAH_DARI
                && gajipokok <= s.HR_UPAH_HINGGA).SingleOrDefault();
@@ -350,19 +350,28 @@ namespace eSPP.Models
             return userCaruman;
         }
 
-        public static decimal GetGajiPokok(ApplicationDbContext db, string HR_PEKERJA)
+        public static decimal GetGajiPokok(ApplicationDbContext db, string HR_PEKERJA, int hariBekerja)
         {
-            HR_MAKLUMAT_PEKERJAAN mpekerjaan = db.HR_MAKLUMAT_PEKERJAAN.Where(s => s.HR_NO_PEKERJA == HR_PEKERJA).SingleOrDefault();
-            decimal gajiPokok = mpekerjaan.HR_GAJI_POKOK != null ? Convert.ToDecimal(mpekerjaan.HR_GAJI_POKOK) : 0;
-            gajiPokok = Decimal.Round(gajiPokok, 2);
+            decimal gajiSehari = GetGajiSehari(db, HR_PEKERJA);
+            decimal gajiPokok = gajiSehari * hariBekerja;
+            gajiPokok = decimal.Round(gajiPokok, 2);
 
             return gajiPokok;
         }
 
         public static decimal GetGajiSehari(ApplicationDbContext db, string HR_PEKERJA)
         {
-            decimal gajiPokok = GetGajiPokok(db, HR_PEKERJA);
-            decimal gajiSehari = gajiPokok / ConstHariBekerja;
+            HR_MAKLUMAT_PEKERJAAN mpekerjaan = db.HR_MAKLUMAT_PEKERJAAN
+                .Where(s => s.HR_NO_PEKERJA == HR_PEKERJA).FirstOrDefault();
+            decimal gajiSehari = 54.00M;
+            if(mpekerjaan != null)
+            {
+                // kalau gred > 19, gaji RM54
+                // kalau gaji < 19, gaji RM72
+                int gred = Convert.ToInt32(mpekerjaan.HR_GRED);
+                if (gred > 19)
+                    gajiSehari = 72.00M;
+            }
             return gajiSehari;
         }
 
@@ -396,7 +405,7 @@ namespace eSPP.Models
             List<HR_MAKLUMAT_ELAUN_POTONGAN> elaunLain = GetElaunLain(db, agree.HR_PEKERJA);
 
             //TODO: make sure bila insert, semua maklumat potongan masuk
-            List<HR_MAKLUMAT_ELAUN_POTONGAN> potonganSemua = GetPotonganSemua(db, agree.HR_PEKERJA);
+            List<HR_MAKLUMAT_ELAUN_POTONGAN> potonganSemua = GetPotonganSemua(db, agree.HR_PEKERJA, agree.gajipokok);
 
             //Add Caruman
             //List<HR_MAKLUMAT_ELAUN_POTONGAN> maklumatcaruman = GetCaruman(db, agree.HR_PEKERJA);
@@ -879,7 +888,7 @@ namespace eSPP.Models
             int bulanBekerja = agree.bulanbekerja;
             int tahunBekerja = agree.tahunbekerja;
             string kelulusanYDP = agree.kelulusanydp;
-            agree.gajipokok = GetGajiPokok(db, agree.HR_PEKERJA);
+            agree.gajipokok = GetGajiPokok(db, agree.HR_PEKERJA, agree.jumlahhari);
             var jumlahJamOT = agree.jumlahot;
             var jumlahElaunOT = GetElaunOT(db, agree.HR_PEKERJA, agree.jumlahhari, agree.jumlahot);
 
@@ -891,7 +900,7 @@ namespace eSPP.Models
                 tahunBekerja = agree.tunggakantahunbekerja;
                 kelulusanYDP = agree.kelulusanydptunggakan;
                 jumlahJamOT = agree.tunggakanjumlahot;
-                agree.gajipokok = GetGajiPokok(db, agree.HR_PEKERJA);
+                agree.gajipokok = GetGajiPokok(db, agree.HR_PEKERJA, agree.tunggakanjumlahhari);
                 jumlahElaunOT = GetElaunOT(db, agree.HR_PEKERJA, agree.tunggakanjumlahhari, agree.tunggakanjumlahot);
             }
 

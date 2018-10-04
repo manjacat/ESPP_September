@@ -157,67 +157,67 @@ namespace eSPP.Models
 
                 int totalBulanBerkhidmat = 0;
 
-                det.Jan = GetGajiBersih(db, elaunlain, 1);
+                det.Jan = GetGajiPokok(db, elaunlain, 1);
                 if(det.Jan > 0)
                 {
                     totalBulanBerkhidmat++;
                 }
-                det.Feb = GetGajiBersih(db, elaunlain, 2);
+                det.Feb = GetGajiPokok(db, elaunlain, 2);
                 if (det.Feb > 0)
                 {
                     totalBulanBerkhidmat++;
                 }
-                det.Mac = GetGajiBersih(db, elaunlain, 3);
+                det.Mac = GetGajiPokok(db, elaunlain, 3);
                 if (det.Mac > 0)
                 {
                     totalBulanBerkhidmat++;
                 }
-                det.April = GetGajiBersih(db, elaunlain, 4);
+                det.April = GetGajiPokok(db, elaunlain, 4);
                 if (det.April > 0)
                 {
                     totalBulanBerkhidmat++;
                 }
-                det.Mei = GetGajiBersih(db, elaunlain, 5);
+                det.Mei = GetGajiPokok(db, elaunlain, 5);
                 if (det.Mei > 0)
                 {
                     totalBulanBerkhidmat++;
                 }
-                det.Jun = GetGajiBersih(db, elaunlain, 6);
+                det.Jun = GetGajiPokok(db, elaunlain, 6);
                 if (det.Jun > 0)
                 {
                     totalBulanBerkhidmat++;
                 }
-                det.Julai = GetGajiBersih(db, elaunlain, 7);
+                det.Julai = GetGajiPokok(db, elaunlain, 7);
                 if (det.Julai > 0)
                 {
                     totalBulanBerkhidmat++;
                 }
-                det.Ogos = GetGajiBersih(db, elaunlain, 8);
+                det.Ogos = GetGajiPokok(db, elaunlain, 8);
                 if (det.Ogos > 0)
                 {
                     totalBulanBerkhidmat++;
                 }
-                det.September = GetGajiBersih(db, elaunlain, 9);
+                det.September = GetGajiPokok(db, elaunlain, 9);
                 if (det.September > 0)
                 {
                     totalBulanBerkhidmat++;
                 }
-                det.Oktober = GetGajiBersih(db, elaunlain, 10);
+                det.Oktober = GetGajiPokok(db, elaunlain, 10);
                 if (det.Oktober > 0)
                 {
                     totalBulanBerkhidmat++;
                 }
-                det.November = GetGajiBersih(db, elaunlain, 11);
+                det.November = GetGajiPokok(db, elaunlain, 11);
                 if (det.November > 0)
                 {
                     totalBulanBerkhidmat++;
                 }
-                det.Disember = GetGajiBersih(db, elaunlain, 12);
+                det.Disember = GetGajiPokok(db, elaunlain, 12);
                 if (det.Disember > 0)
                 {
                     totalBulanBerkhidmat++;
                 }
-                det.JumlahGaji = GetGajiBersihSum(db, elaunlain, startMonth, endMonth);
+                det.JumlahGaji = GetSumGajiPokok(elaunlain);
                 det.MinBulan = startMonth;
                 det.MaxBulan = endMonth;
 
@@ -231,7 +231,7 @@ namespace eSPP.Models
                 decimal totalGajiPokok = GetSumGajiPokok(elaunlain);
                 decimal bonusLayak = totalGajiPokok / totalBulanDikira;
                 det.BonusLayak = bonusLayak;
-                det.BonusDiterima = bonusLayak * (decimal)1.0;
+                det.BonusDiterima = bonusLayak * (decimal)1.0; //temp start with decimal 1.0
                 det.IsMuktamad = false;
                 outputList.Add(det);
             }
@@ -241,26 +241,27 @@ namespace eSPP.Models
         }
 
         //this will be easier if kod potongan sosco masuk dlm transaksi
-        private static decimal GetGajiBersih(ApplicationDbContext db, List<HR_TRANSAKSI_SAMBILAN_DETAIL> elaunList, int bulan)
+        private static decimal GetGajiPokok(ApplicationDbContext db, List<HR_TRANSAKSI_SAMBILAN_DETAIL> elaunList, int bulan)
         {
             decimal gajiPokok = elaunList
                 .Where(s => s.HR_KOD_IND == "G" && s.HR_BULAN_BEKERJA == bulan).Sum(c => c.HR_JUMLAH).Value;
-            if(gajiPokok > 0)
-            {
-                decimal elaun = elaunList
-                    .Where(s => s.HR_KOD_IND == "E" && s.HR_BULAN_BEKERJA == bulan).Sum(c => c.HR_JUMLAH).Value;
-                decimal elaunOT = elaunList
-                    .Where(s => s.HR_KOD == "E0164" && s.HR_BULAN_BEKERJA == bulan).Sum(c => c.HR_JUMLAH).Value;
-                decimal potongan = elaunList
-                    .Where(s => s.HR_KOD_IND == "P" && s.HR_BULAN_BEKERJA == bulan).Sum(c => c.HR_JUMLAH).Value;
-                decimal potonganSocso = PageSejarahModel.GetPotonganSocso(db, gajiPokok, elaunOT);
-                decimal gajiBersih = gajiPokok + elaun - potongan - potonganSocso;                
-                return gajiBersih;
-            }
-            else
-            {
-                return gajiPokok;
-            }
+            //if(gajiPokok > 0)
+            //{
+            //    decimal elaun = elaunList
+            //        .Where(s => s.HR_KOD_IND == "E" && s.HR_BULAN_BEKERJA == bulan).Sum(c => c.HR_JUMLAH).Value;
+            //    decimal elaunOT = elaunList
+            //        .Where(s => s.HR_KOD == "E0164" && s.HR_BULAN_BEKERJA == bulan).Sum(c => c.HR_JUMLAH).Value;
+            //    decimal potongan = elaunList
+            //        .Where(s => s.HR_KOD_IND == "P" && s.HR_BULAN_BEKERJA == bulan).Sum(c => c.HR_JUMLAH).Value;
+            //    decimal potonganSocso = PageSejarahModel.GetPotonganSocso(db, gajiPokok, elaunOT);
+            //    decimal gajiBersih = gajiPokok + elaun - potongan - potonganSocso;                
+            //    return gajiBersih;
+            //}
+            //else
+            //{
+            //    return gajiPokok;
+            //}
+            return gajiPokok;
         }
 
         //this will be easier if kod potongan sosco masuk dlm transaksi
@@ -269,7 +270,7 @@ namespace eSPP.Models
             decimal sumGajiBersih = 0;
             for(int i = minBulan; i <= maxBulan; i++)
             {
-                decimal gajiBersihBulan = GetGajiBersih(db, elaunList, i);
+                decimal gajiBersihBulan = GetGajiPokok(db, elaunList, i);
                 sumGajiBersih = sumGajiBersih + gajiBersihBulan;
             }
             return sumGajiBersih;

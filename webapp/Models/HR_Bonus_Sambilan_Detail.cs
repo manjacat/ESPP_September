@@ -292,5 +292,28 @@ namespace eSPP.Models
             }
         }
 
+        public static void UpdateBonusDiterima(int month, int year, decimal gandaan)
+        {
+            ApplicationDbContext db = new ApplicationDbContext();
+            List<HR_BONUS_SAMBILAN_DETAIL> listD = db.HR_BONUS_SAMBILAN_DETAIL
+                .Where(s => s.HR_BULAN_BONUS == month
+                && s.HR_TAHUN_BONUS == year).ToList();
+            foreach(HR_BONUS_SAMBILAN_DETAIL det in listD)
+            {
+                if(det.HR_BONUS_LAYAK != null)
+                {
+                    decimal bonusDiterima = det.HR_BONUS_LAYAK.Value * gandaan;
+                    det.HR_BONUS_DITERIMA = bonusDiterima;
+                }
+                else
+                {
+                    det.HR_BONUS_LAYAK = 0;
+                    det.HR_BONUS_DITERIMA = 0;
+                }
+                db.Entry(det).State = EntityState.Modified;
+                db.SaveChanges();
+            }
+        }
+
     }
 }
