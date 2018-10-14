@@ -368,15 +368,24 @@ namespace eSPP.Models
             {
                 // kalau gred > 19, gaji RM54
                 // kalau gaji < 19, gaji RM72
-                int gred = Convert.ToInt32(mpekerjaan.HR_GRED);
-                if (gred > 19)
+                //int gred = Convert.ToInt32(mpekerjaan.HR_GRED);
+                string gred = mpekerjaan.HR_KUMPULAN;
+                List<string> gred54 = new List<string>
+                {
+                    "C",
+                    "D",
+                    "E"
+                };
+                if (!gred54.Contains(gred))
+                {
                     gajiSehari = 72.00M;
+                }
             }
             return gajiSehari;
         }
 
         public static decimal GetElaunOT(ApplicationDbContext db, string HR_PEKERJA, int jumlahHari, decimal jumlahJamOT)
-        {
+        {  
             var gajiSehari = GetGajiSehari(db, HR_PEKERJA);
             var gajisehariot = (gajiSehari * jumlahHari) * 12 / 2504;
             var elaunOT = gajisehariot * jumlahJamOT;

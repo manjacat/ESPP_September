@@ -123,12 +123,21 @@ namespace eSPP.Models
         public static List<BonusSambilanDetailModel> GetDetailsFromTransaksi
             (int startMonth, int month, int year, int endMonth)
         {
+           
             ApplicationDbContext db = new ApplicationDbContext();
+
+            //get list of pekerja tidak aktif
+            List<string> listHR_TidakAktif = db.HR_MAKLUMAT_PERIBADI
+                .Where(s => s.HR_AKTIF_IND == "T"
+                && s.HR_ALASAN != "A17").Select(s => s.HR_NO_PEKERJA).Distinct().ToList();
+
+            //exclude bulan dibayar (month) and filter out tidak aktif
             List<string> listHR_PEKERJA = db.HR_TRANSAKSI_SAMBILAN_DETAIL
-                .Where(s => s.HR_BULAN_DIBAYAR == month
-                && s.HR_BULAN_BEKERJA >= startMonth
+                .Where(s => s.HR_BULAN_BEKERJA >= startMonth
                 && s.HR_BULAN_BEKERJA <= endMonth
-                && s.HR_TAHUN == year).Select(s => s.HR_NO_PEKERJA).Distinct().ToList();
+                && s.HR_TAHUN == year
+                && !listHR_TidakAktif.Contains(s.HR_NO_PEKERJA))                
+                .Select(s => s.HR_NO_PEKERJA).Distinct().ToList();
 
             List<BonusSambilanDetailModel> outputList = new List<BonusSambilanDetailModel>();
             foreach (string hr_pekerja in listHR_PEKERJA)
@@ -140,7 +149,8 @@ namespace eSPP.Models
                     && x.HR_TAHUN == year
                     && x.HR_BULAN_BEKERJA >= startMonth
                     && x.HR_BULAN_BEKERJA <= endMonth
-                    && x.HR_BULAN_DIBAYAR == month).ToList();
+                    //&& x.HR_BULAN_DIBAYAR == month 
+                    ).ToList();
 
                 HR_MAKLUMAT_PERIBADI maklumat = db.HR_MAKLUMAT_PERIBADI
                     .Where(m => m.HR_NO_PEKERJA == hr_pekerja).FirstOrDefault();
@@ -233,11 +243,28 @@ namespace eSPP.Models
                 det.BonusLayak = bonusLayak;
                 det.BonusDiterima = bonusLayak * (decimal)1.0; //temp start with decimal 1.0
                 det.IsMuktamad = false;
-                outputList.Add(det);
+
+                if (!IsNoData(det))
+                {
+                    outputList.Add(det);
+                }
             }
             //sort by Nama
             outputList = outputList.OrderBy(x => x.Nama).ToList();
             return outputList;
+        }
+
+        private static bool IsNoData(BonusSambilanDetailModel det)
+        {
+            bool retbool = false;
+
+            if(det.Jan == 0 && det.Feb == 0 && det.Mac == 0 && det.April == 0 && det.Mei == 0 && det.Jun == 0
+                && det.Julai == 0 && det.Ogos == 0 && det.September == 0 && det.Oktober == 0 
+                && det.November == 0 && det.Disember == 0)
+            {
+                retbool = true;
+            }
+            return retbool;
         }
 
         //this will be easier if kod potongan sosco masuk dlm transaksi
