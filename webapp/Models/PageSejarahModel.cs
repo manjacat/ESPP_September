@@ -336,7 +336,11 @@ namespace eSPP.Models
                .Where(s => gajipokok >= s.HR_UPAH_DARI
                && gajipokok <= s.HR_UPAH_HINGGA).SingleOrDefault();
 
-            decimal carumanPekerja = decimal.Round(kwsp.HR_CARUMAN_PEKERJA, 2);
+            decimal carumanPekerja = 0;
+            if(kwsp != null)
+            {
+                carumanPekerja = decimal.Round(kwsp.HR_CARUMAN_PEKERJA, 2);
+            }
 
             HR_MAKLUMAT_ELAUN_POTONGAN userCaruman = new HR_MAKLUMAT_ELAUN_POTONGAN
             {
